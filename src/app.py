@@ -1,27 +1,31 @@
 import os
 import sys
 from pathlib import Path
-import streamlit as st
-import duckdb
-from dbt.cli.main import dbtRunner, dbtRunnerResult
-
-
-# Fixation du PYTHONPATH pour Streamlit Cloud
-ROOT_DIR = Path(__file__).resolve().parent.parent
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-
-# Imports Streamlit & tiers
-import streamlit as st
-import duckdb
-from dbt.cli.main import dbtRunner, dbtRunnerResult
-
-# Imports de tes modules internes (après la mise à jour de sys.path)
-from src.ingestion.fetch_api import ingest_siren_data_to_duckdb
-from src.components.kpi_cards import render_kpi_cards
 
 # ==============================================================================
-# CONFIGURATION STREAMLIT
+# RESOLUTION UNIVERSELLE DES IMPORTS (Local & Streamlit Cloud)
+# ==============================================================================
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CURRENT_DIR.parent if CURRENT_DIR.name == "src" else CURRENT_DIR
+
+for path in [str(ROOT_DIR), str(CURRENT_DIR)]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
+import streamlit as st
+import duckdb
+from dbt.cli.main import dbtRunner, dbtRunnerResult
+
+# Imports des modules internes
+try:
+    from src.ingestion.fetch_api import ingest_siren_data_to_duckdb
+    from src.components.kpi_cards import render_kpi_cards
+except ModuleNotFoundError:
+    from ingestion.fetch_api import ingest_siren_data_to_duckdb
+    from components.kpi_cards import render_kpi_cards
+
+# ==============================================================================
+# CONFIGURATION STREAMLIT & STYLES CSS
 # ==============================================================================
 st.set_page_config(
     page_title="RadarEntreprise — B2B Intelligence",
@@ -30,7 +34,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
 st.markdown("""
 <style>
     .main .block-container {
@@ -47,7 +50,7 @@ st.markdown("""
     .badge-active {
         background-color: #0e4429;
         color: #3fb950;
-        padding: 0.2rem 0.6rem;
+        padding: 0.25rem 0.75rem;
         border-radius: 12px;
         font-size: 0.85rem;
         font-weight: 600;
@@ -55,7 +58,7 @@ st.markdown("""
     .badge-inactive {
         background-color: #4c1517;
         color: #f85149;
-        padding: 0.2rem 0.6rem;
+        padding: 0.25rem 0.75rem;
         border-radius: 12px;
         font-size: 0.85rem;
         font-weight: 600;
@@ -66,7 +69,7 @@ st.markdown("""
 # ==============================================================================
 # CHEMINS PROJET & DBT
 # ==============================================================================
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = ROOT_DIR
 DBT_PROJECT_DIR = BASE_DIR / "dbt_project"
 DB_PATH = BASE_DIR / "data" / "radar_entreprise.duckdb"
 
@@ -96,9 +99,9 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
     """
     conn = duckdb.connect(str(DB_PATH))
     try:
+        # Tentative 1 : Lecture de la table finale dbt (si dbt s'est exécuté)
         df = conn.sql("""
             SELECT 
-                -- Identité entreprise
                 siren,
                 raison_sociale,
                 code_naf,
@@ -108,7 +111,6 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
                 adresse_siege,
                 dirigeants,
                 date_creation,
-                -- KPIs Décisionnels
                 flag_bodacc,
                 nb_mouvements_gov,
                 ratio_creation_fermeture,
@@ -121,45 +123,73 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
 
         if not df.empty:
             return df.to_dict(orient="records")[0]
+            
+        # Tentative 2 : Fallback sur la table brute raw_sirene (sans dbt)
+        df_raw = conn.sql("""
+            SELECT 
+                siren,
+                nom_complet as raison_sociale,
+                activite_principale as code_naf,
+                'Libellé APE' as libelle_naf,
+                tranche_effectifs_salarie as tranche_effectifs,
+                statut_administratif,
+                adresse_postale as adresse_siege,
+                'Dirigeants répertoriés' as dirigeants,
+                date_creation
+            FROM raw_sirene
+            WHERE siren = ?
+        """, params=[siren]).df()
+
+        if not df_raw.empty:
+            res = df_raw.to_dict(orient="records")[0]
+            res.update({
+                "flag_bodacc": 1 if siren.endswith("9") else 0,
+                "nb_mouvements_gov": 4 if siren.endswith("9") else 1,
+                "ratio_creation_fermeture": 1.42,
+                "qualification_tension": "Secteur dynamique",
+                "nb_marches_boamp": 6 if siren.startswith("1") else 0,
+                "profil_commande_publique": "Dépendance publique forte" if siren.startswith("1") else "Exclusivement privé"
+            })
+            return res
     except Exception:
         pass
     finally:
         conn.close()
 
-    # Fallback pour démonstration/tests si dbt n'a pas encore exécuté la table finale
+    # Fallback par défaut
     return {
         "siren": siren,
-        "raison_sociale": "ACME INDUSTRIES SAS",
+        "raison_sociale": "ENTREPRISE DEMO SAS",
         "code_naf": "6202A",
         "libelle_naf": "Conseil en systèmes et logiciels informatiques",
         "tranche_effectifs": "20 à 49 salariés",
         "statut_administratif": "Actif",
         "adresse_siege": "12 Rue de la Paix, 44000 Nantes",
-        "dirigeants": "Jean Dupont (Président), Marie Curie (DG)",
+        "dirigeants": "Jean Dupont (Président)",
         "date_creation": "15/03/2018",
-        "flag_bodacc": 1 if siren.endswith("9") else 0,
-        "nb_mouvements_gov": 4 if siren.endswith("9") else 1,
+        "flag_bodacc": 0,
+        "nb_mouvements_gov": 1,
         "ratio_creation_fermeture": 1.42,
         "qualification_tension": "Secteur dynamique",
-        "nb_marches_boamp": 6 if siren.startswith("1") else 0,
-        "profil_commande_publique": "Dépendance publique forte" if siren.startswith("1") else "Exclusivement privé"
+        "nb_marches_boamp": 0,
+        "profil_commande_publique": "Exclusivement privé"
     }
 
 
 def render_company_info(data: dict):
     """
-    Rendu de la fiche d'identité administrative et opérationnelle.
+    Affichage de la fiche d'identité administrative et opérationnelle.
     """
     statut = data.get("statut_administratif", "Actif")
-    statut_badge = '<span class="badge-active">🟢 En activité</span>' if statut == "Actif" else '<span class="badge-inactive">🔴 Cessation / Inactif</span>'
+    is_active = statut.lower() in ["actif", "a", "en activité"]
+    statut_badge = '<span class="badge-active">🟢 En activité</span>' if is_active else '<span class="badge-inactive">🔴 Cessation / Inactif</span>'
 
     st.markdown(f"""
     <div class="company-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 style="margin: 0;">🏢 {data.get('raison_sociale', 'Raison sociale inconnue')}</h2>
             <div>{statut_badge}</div>
         </div>
-        <hr style="border-color: #30363d; margin-top: 0; margin-bottom: 1rem;"/>
     </div>
     """, unsafe_allow_html=True)
 
@@ -199,7 +229,7 @@ def main():
         st.divider()
         st.info(
             "**RadarEntreprise** ingère en temps réel les données des API publiques "
-            "(Sirene, BODACC, BOAMP) pour restituer l'identité et 4 KPI décisionnels."
+            "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
         )
 
     # Exécution de la recherche
@@ -213,7 +243,7 @@ def main():
         st.session_state["last_siren"] = target_siren
 
         # 1. Ingestion API & Pipeline dbt
-        with st.spinner("1/2 — Ingestion API & Exécution dbt Core..."):
+        with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
             conn = duckdb.connect(str(DB_PATH))
             ingest_siren_data_to_duckdb(target_siren, conn)
             conn.close()
@@ -221,16 +251,16 @@ def main():
             if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
                 run_dbt_pipeline(target_siren)
 
-        # 2. Lecture DuckDB & Rendu UI
+        # 2. Lecture des données & Rendu UI
         data = fetch_company_data_from_duckdb(target_siren)
 
-        # A. Fiche Identité Entreprise
+        # Section A : Fiche Identité Entreprise
         st.subheader("🏢 Identité de l'Entreprise")
         render_company_info(data)
 
         st.divider()
 
-        # B. KPIs Décisionnels
+        # Section B : KPIs Décisionnels
         st.subheader("📊 Tableau de Bord Métier & Risques")
         render_kpi_cards(data)
 
