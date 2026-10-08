@@ -1,0 +1,44 @@
+name: CI RadarEntreprise
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest ruff
+
+      - name: Contrôle qualité Python (Linter Ruff)
+        run: |
+          # Vérifie la syntaxe et la propreté du code Python dans src/
+          ruff check src/
+
+      - name: Validation et compilation dbt (DuckDB)
+        run: |
+          cd dbt_project
+          # Test de la syntaxe et compilation des modèles dbt
+          dbt parse --profiles-dir .
+          dbt compile --profiles-dir .
+
+      - name: Exécution des tests unitaires Python (optionnel)
+        run: |
+          # Lance les tests unitaires s'il y en a
+          pytest --ignore=dbt_project
