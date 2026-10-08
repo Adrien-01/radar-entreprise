@@ -86,7 +86,7 @@ st.markdown("""
     /* SCORECARDS XXL (2x2) — Verts avec Survol Carré Lumineux */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
-        background: #15803d !important; /* Vert soutenu */
+        background: #a3e635 !important; 
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
         padding: 1.8rem 1.5rem !important;
