@@ -62,7 +62,6 @@ st.markdown("""
         flex-wrap: wrap;
     }
 
-
     .brand-title {
         font-size: 4rem;
         font-weight: 800;
@@ -84,39 +83,84 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* HOVER EFFECT : KPI SCORECARDS & METRICS */
+    /* SCORECARDS XXL (2x2) — Verts avec Survol Carré Lumineux */
     /* ---------------------------------------------------------------------- */
-    [data-testid="column"] > div:has(div[data-testid="stMetric"]),
-    [data-testid="stMetric"],
-    .kpi-score-card {
-        background: linear-gradient(145deg, #16191d 0%, #101215 100%) !important;
-        border: 1.5px solid #232830 !important;
+    .kpi-card-large {
+        background: #15803d !important; /* Vert soutenu */
+        border: 2px solid #22c55e !important;
         border-radius: 16px !important;
-        padding: 1.2rem 1rem !important;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        cursor: pointer !important;
+        padding: 1.8rem 1.5rem !important;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        transition: all 0.25s ease-in-out !important;
+        cursor: pointer;
     }
 
-    /* Survol néon vert pour les KPI Scorecards */
-    [data-testid="column"] > div:has(div[data-testid="stMetric"]):hover,
-    [data-testid="stMetric"]:hover,
-    .kpi-score-card:hover {
-        transform: translateY(-8px) scale(1.02) !important;
-        border-color: #a3e635 !important;
-        box-shadow: 0 0 25px rgba(163, 230, 53, 0.35) !important;
-        background: linear-gradient(145deg, #1c2227 0%, #121518 100%) !important;
+    /* Effet au survol : Cadre clair très distinct + Halo lumineux blanc/vert */
+    .kpi-card-large:hover {
+        transform: translateY(-4px) scale(1.01);
+        background: #166534 !important; /* Vert légèrement plus sombre */
+        border: 3px solid #ffffff !important; /* Carré/contour blanc clair net */
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 0 10px rgba(163, 230, 53, 0.4) !important;
     }
 
-    div[data-testid="stMetricLabel"] {
-        color: #8b949e !important;
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #a3e635 !important;
-        font-size: 2rem !important;
+    /* Textes à l'intérieur des cartes XXL */
+    .kpi-title {
+        color: #f0fdf4 !important;
+        font-size: 1.1rem !important;
         font-weight: 800 !important;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .kpi-body {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0.8rem 0;
+    }
+
+    .kpi-value-large {
+        color: #ffffff !important;
+        font-size: 2.8rem !important;
+        font-weight: 900 !important;
+        line-height: 1;
+    }
+
+    .kpi-unit-large {
+        color: #dcfce7 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600;
+    }
+
+    .kpi-footer {
+        color: #bbf7d0 !important;
+        font-size: 0.85rem !important;
+        font-weight: 600;
+    }
+
+    /* Badges contrastés pour fonds verts */
+    .badge-dark {
+        background-color: rgba(0, 0, 0, 0.35) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .badge-red {
+        background-color: #991b1b !important;
+        color: #ffffff !important;
+        border: 1px solid #f85149 !important;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
     }
 
     /* ---------------------------------------------------------------------- */
@@ -138,7 +182,7 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(163, 230, 53, 0.25) !important;
     }
 
-    /* Badges */
+    /* Badges Fiche d'identité */
     .badge-active {
         background-color: rgba(163, 230, 53, 0.15);
         color: #a3e635;
@@ -342,13 +386,14 @@ def main():
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
-        '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
+        '<span class="white-subtitle">•  L\'analyse d\'entreprise en un clic</span>'
         '</div>',
         unsafe_allow_html=True,
     )
     st.caption(
-    "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
-    "et le dynamisme commercial de n'importe quelle entreprise.")
+        "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
+        "et le dynamisme commercial de n'importe quelle entreprise."
+    )
     st.divider()
 
     # Barre latérale
@@ -390,13 +435,13 @@ def main():
         # 2. Lecture des données & Rendu UI
         data = fetch_company_data_from_duckdb(target_siren)
 
-        # SECTION 1 : SCORECARDS / KPIS EN PREMIER
-        render_kpi_cards(data)
+        # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
+        render_company_info(data)
 
         st.divider()
 
-        # SECTION 2 : FICHE IDENTITÉ D'ENTREPRISE
-        render_company_info(data)
+        # SECTION 2 : SCORECARDS / KPIS EN PREMIER (Grid 2x2 XXL)
+        render_kpi_cards(data)
 
         st.divider()
         with st.expander("🔎 Détails des métriques brutes (DuckDB)"):
