@@ -25,7 +25,7 @@ except ModuleNotFoundError:
     from components.kpi_cards import render_kpi_cards
 
 # ==============================================================================
-# CONFIGURATION STREAMLIT & STYLES CSS (STYLE NEON DARK)
+# CONFIGURATION STREAMLIT & STYLES CSS (STYLE NEON DARK ENHANCED)
 # ==============================================================================
 st.set_page_config(
     page_title="RadarEntreprise — B2B Intelligence",
@@ -54,7 +54,7 @@ st.markdown("""
         border-right: 1px solid #1f242d;
     }
 
-    /* Cards Styling & Hover Effect */
+    /* Standard Cards Styling */
     .dark-card {
         background-color: #16191d;
         border: 1px solid #232830;
@@ -65,26 +65,41 @@ st.markdown("""
     }
 
     .dark-card:hover {
-        transform: translateY(-6px);
-        border-color: #a3e635;
-        box-shadow: 0px 10px 25px -5px rgba(163, 230, 53, 0.15);
+        transform: translateY(-4px);
+        border-color: #30363d;
     }
 
-    /* Score / KPI Interactive Cards */
-    .kpi-score-card {
-        background-color: #121518;
-        border: 1px solid #232830;
-        border-radius: 16px;
-        padding: 1.25rem;
+    /* Score / KPI Interactive Cards - Agrandies & Dynamiques */
+    .kpi-score-card, div[data-testid="stMetric"] {
+        background: linear-gradient(145deg, #16191d 0%, #101215 100%);
+        border: 1.5px solid #232830;
+        border-radius: 18px;
+        padding: 1.8rem 1.4rem;
         text-align: center;
-        transition: all 0.3s ease;
+        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
-    .kpi-score-card:hover {
-        transform: translateY(-5px) scale(1.02);
+    .kpi-score-card:hover, div[data-testid="stMetric"]:hover {
+        transform: translateY(-8px) scale(1.03);
         border-color: #a3e635;
-        box-shadow: 0 8px 20px rgba(163, 230, 53, 0.2);
+        box-shadow: 0 12px 30px -5px rgba(163, 230, 53, 0.3);
+        background: linear-gradient(145deg, #1c2227 0%, #121518 100%);
+    }
+
+    /* Amélioration de la lisibilité des métriques Streamlit si utilisées dans render_kpi_cards */
+    div[data-testid="stMetricLabel"] {
+        color: #8b949e !important;
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #a3e635 !important;
+        font-size: 2.2rem !important;
+        font-weight: 800 !important;
     }
 
     /* Typography & Accents */
@@ -303,8 +318,12 @@ def render_company_info(data: dict):
 
 
 def main():
-    st.markdown('<h1 class="title-highlight">📡 Finantech X <span class="lime-text">• RadarEntreprise</span></h1>', unsafe_allow_html=True)
-    st.caption("Plateforme d'Intelligence B2B On-Demand • Streamlit • DuckDB • dbt Core")
+    st.markdown(
+        '<h1 class="title-highlight">📡 RadarEntreprise <span'
+        ' class="lime-text">• L\'analyse d\'entreprise en un clic</span></h1>',
+        unsafe_allow_html=True,
+    )
+    st.caption('Données publiques en temps réel : INSEE Sirene • BODACC • BOAMP')
     st.divider()
 
     # Barre latérale
@@ -347,15 +366,11 @@ def main():
         data = fetch_company_data_from_duckdb(target_siren)
 
         # Section A : Fiche Identité Entreprise
-        st.markdown('<h3 style="color:#ffffff;">🏢 Identité de l\'Entreprise</h3>', unsafe_allow_html=True)
         render_company_info(data)
 
         st.divider()
 
-        # Section B : KPIs Décisionnels
-        st.markdown('<h3 style="color:#ffffff;">📊 Tableau de Bord Métier & Risques</h3>', unsafe_allow_html=True)
-        
-        # Rendu des cartes de KPI (intègrent le survol via la classe .dark-card ou .kpi-score-card)
+        # Section B : KPIs Décisionnels (Rendu direct sans sous-titre)
         render_kpi_cards(data)
 
         st.divider()
