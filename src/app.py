@@ -55,20 +55,25 @@ st.markdown("""
     }
 
     /* Typography Header */
-    .title-highlight {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: -0.5px;
+    .header-container {
         display: flex;
         align-items: baseline;
-        gap: 0.6rem;
+        gap: 0.8rem;
         flex-wrap: wrap;
     }
 
-    .lime-text-sub {
+    /* RadarEntreprise en vert néon et plus gros */
+    .brand-title {
+        font-size: 2.5rem;
+        font-weight: 800;
         color: #a3e635;
-        font-size: 1.2rem !important;
+        letter-spacing: -0.5px;
+    }
+
+    /* Sous-titre en blanc */
+    .white-subtitle {
+        color: #ffffff;
+        font-size: 1.1rem !important;
         font-weight: 500 !important;
         letter-spacing: normal;
     }
@@ -333,9 +338,12 @@ def render_company_info(data: dict):
 
 
 def main():
+    # En-tête : RadarEntreprise (Gros & Vert) + Sous-titre (Blanc)
     st.markdown(
-        '<div class="title-highlight">📡 RadarEntreprise <span'
-        ' class="lime-text-sub">• L\'analyse d\'entreprise en un clic</span></div>',
+        '<div class="header-container">'
+        '<span class="brand-title">📡 RadarEntreprise</span>'
+        '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
     st.caption('Données publiques en temps réel : INSEE Sirene • BODACC • BOAMP')
