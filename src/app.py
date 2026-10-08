@@ -5,8 +5,18 @@ import streamlit as st
 import duckdb
 from dbt.cli.main import dbtRunner, dbtRunnerResult
 
-# Importation des modules internes
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+# Fixation du PYTHONPATH pour Streamlit Cloud
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+# Imports Streamlit & tiers
+import streamlit as st
+import duckdb
+from dbt.cli.main import dbtRunner, dbtRunnerResult
+
+# Imports de tes modules internes (après la mise à jour de sys.path)
 from src.ingestion.fetch_api import ingest_siren_data_to_duckdb
 from src.components.kpi_cards import render_kpi_cards
 
