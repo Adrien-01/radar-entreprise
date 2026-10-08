@@ -62,9 +62,9 @@ st.markdown("""
         flex-wrap: wrap;
     }
 
-    /* RadarEntreprise en vert néon et plus gros */
+
     .brand-title {
-        font-size: 2.5rem;
+        font-size: 4rem;
         font-weight: 800;
         color: #a3e635;
         letter-spacing: -0.5px;
@@ -341,12 +341,14 @@ def main():
     # En-tête : RadarEntreprise (Gros & Vert) + Sous-titre (Blanc)
     st.markdown(
         '<div class="header-container">'
-        '<span class="brand-title">📡 RadarEntreprise</span>'
+        '<span class="brand-title">RadarEntreprise</span>'
         '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
         '</div>',
         unsafe_allow_html=True,
     )
-    st.caption('Données publiques en temps réel : INSEE Sirene • BODACC • BOAMP')
+    st.caption(
+    "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
+    "et le dynamisme commercial de n'importe quelle entreprise.")
     st.divider()
 
     # Barre latérale
