@@ -25,7 +25,7 @@ except ModuleNotFoundError:
     from components.kpi_cards import render_kpi_cards
 
 # ==============================================================================
-# CONFIGURATION STREAMLIT & STYLES CSS (STYLE NEON DARK ENHANCED)
+# CONFIGURATION STREAMLIT & STYLES CSS
 # ==============================================================================
 st.set_page_config(
     page_title="RadarEntreprise — B2B Intelligence",
@@ -44,7 +44,7 @@ st.markdown("""
     }
     
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 1.8rem;
         padding-bottom: 2rem;
     }
 
@@ -54,65 +54,83 @@ st.markdown("""
         border-right: 1px solid #1f242d;
     }
 
-    /* Standard Cards Styling */
-    .dark-card {
-        background-color: #16191d;
-        border: 1px solid #232830;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1.2rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .dark-card:hover {
-        transform: translateY(-4px);
-        border-color: #30363d;
-    }
-
-    /* Score / KPI Interactive Cards - Agrandies & Dynamiques */
-    .kpi-score-card, div[data-testid="stMetric"] {
-        background: linear-gradient(145deg, #16191d 0%, #101215 100%);
-        border: 1.5px solid #232830;
-        border-radius: 18px;
-        padding: 1.8rem 1.4rem;
-        text-align: center;
-        transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .kpi-score-card:hover, div[data-testid="stMetric"]:hover {
-        transform: translateY(-8px) scale(1.03);
-        border-color: #a3e635;
-        box-shadow: 0 12px 30px -5px rgba(163, 230, 53, 0.3);
-        background: linear-gradient(145deg, #1c2227 0%, #121518 100%);
-    }
-
-    /* Amélioration de la lisibilité des métriques Streamlit si utilisées dans render_kpi_cards */
-    div[data-testid="stMetricLabel"] {
-        color: #8b949e !important;
-        font-size: 1.05rem !important;
-        font-weight: 600 !important;
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #a3e635 !important;
-        font-size: 2.2rem !important;
-        font-weight: 800 !important;
-    }
-
-    /* Typography & Accents */
-    .lime-text {
-        color: #a3e635;
-        font-weight: 700;
-    }
-
+    /* Typography Header */
     .title-highlight {
         font-size: 2.2rem;
         font-weight: 800;
         color: #ffffff;
         letter-spacing: -0.5px;
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+    }
+
+    .lime-text-sub {
+        color: #a3e635;
+        font-size: 1.2rem !important;
+        font-weight: 500 !important;
+        letter-spacing: normal;
+    }
+
+    .lime-text {
+        color: #a3e635;
+        font-weight: 700;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* HOVER EFFECT : KPI SCORECARDS & METRICS */
+    /* ---------------------------------------------------------------------- */
+    [data-testid="column"] > div:has(div[data-testid="stMetric"]),
+    [data-testid="stMetric"],
+    .kpi-score-card {
+        background: linear-gradient(145deg, #16191d 0%, #101215 100%) !important;
+        border: 1.5px solid #232830 !important;
+        border-radius: 16px !important;
+        padding: 1.2rem 1rem !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        cursor: pointer !important;
+    }
+
+    /* Survol néon vert pour les KPI Scorecards */
+    [data-testid="column"] > div:has(div[data-testid="stMetric"]):hover,
+    [data-testid="stMetric"]:hover,
+    .kpi-score-card:hover {
+        transform: translateY(-8px) scale(1.02) !important;
+        border-color: #a3e635 !important;
+        box-shadow: 0 0 25px rgba(163, 230, 53, 0.35) !important;
+        background: linear-gradient(145deg, #1c2227 0%, #121518 100%) !important;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #8b949e !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #a3e635 !important;
+        font-size: 2rem !important;
+        font-weight: 800 !important;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* HOVER EFFECT : FICHE IDENTITÉ D'ENTREPRISE (.dark-card) */
+    /* ---------------------------------------------------------------------- */
+    .dark-card {
+        background-color: #16191d;
+        border: 1.5px solid #232830;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    /* Survol néon vert pour le cadre d'identité */
+    .dark-card:hover {
+        transform: translateY(-4px);
+        border-color: #a3e635 !important;
+        box-shadow: 0 0 20px rgba(163, 230, 53, 0.25) !important;
     }
 
     /* Badges */
@@ -193,7 +211,6 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
     """
     conn = duckdb.connect(str(DB_PATH))
     try:
-        # Tentative 1 : Lecture de la table finale dbt (si dbt s'est exécuté)
         df = conn.sql("""
             SELECT 
                 siren,
@@ -218,7 +235,6 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
         if not df.empty:
             return df.to_dict(orient="records")[0]
             
-        # Tentative 2 : Fallback sur la table brute raw_sirene (sans dbt)
         df_raw = conn.sql("""
             SELECT 
                 siren,
@@ -250,7 +266,6 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
     finally:
         conn.close()
 
-    # Fallback par défaut
     return {
         "siren": siren,
         "raison_sociale": "ENTREPRISE DEMO SAS",
@@ -282,7 +297,7 @@ def render_company_info(data: dict):
     <div class="dark-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <div>
-                <h2 style="margin: 0; color: #ffffff; font-size: 1.8rem;">🏢 {data.get('raison_sociale', 'Raison sociale inconnue')}</h2>
+                <h2 style="margin: 0; color: #ffffff; font-size: 1.6rem;">🏢 {data.get('raison_sociale', 'Raison sociale inconnue')}</h2>
                 <span style="color: #8b949e; font-size: 0.9rem;">SIREN : <strong class="lime-text">{data.get('siren')}</strong></span>
             </div>
             <div>{statut_badge}</div>
@@ -319,8 +334,8 @@ def render_company_info(data: dict):
 
 def main():
     st.markdown(
-        '<h1 class="title-highlight">📡 RadarEntreprise <span'
-        ' class="lime-text">• L\'analyse d\'entreprise en un clic</span></h1>',
+        '<div class="title-highlight">📡 RadarEntreprise <span'
+        ' class="lime-text-sub">• L\'analyse d\'entreprise en un clic</span></div>',
         unsafe_allow_html=True,
     )
     st.caption('Données publiques en temps réel : INSEE Sirene • BODACC • BOAMP')
@@ -365,13 +380,13 @@ def main():
         # 2. Lecture des données & Rendu UI
         data = fetch_company_data_from_duckdb(target_siren)
 
-        # Section A : Fiche Identité Entreprise
-        render_company_info(data)
+        # SECTION 1 : SCORECARDS / KPIS EN PREMIER
+        render_kpi_cards(data)
 
         st.divider()
 
-        # Section B : KPIs Décisionnels (Rendu direct sans sous-titre)
-        render_kpi_cards(data)
+        # SECTION 2 : FICHE IDENTITÉ D'ENTREPRISE
+        render_company_info(data)
 
         st.divider()
         with st.expander("🔎 Détails des métriques brutes (DuckDB)"):
