@@ -86,7 +86,7 @@ st.markdown("""
     /* SCORECARDS XXL (2x2) — Verts avec Survol Carré Lumineux */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
-        background: #a3e635 !important; 
+        background: #18181B !important; 
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
         padding: 1.8rem 1.5rem !important;
@@ -103,7 +103,7 @@ st.markdown("""
     .kpi-card-large:hover {
         transform: translateY(-4px) scale(1.01);
         background: #166534 !important; /* Vert légèrement plus sombre */
-        border: 3px solid #ffffff !important; /* Carré/contour blanc clair net */
+        border: 3px solid #a3e635 !important; /* Carré/contour blanc clair net */
         box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 0 10px rgba(163, 230, 53, 0.4) !important;
     }
 
