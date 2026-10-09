@@ -87,6 +87,25 @@ st.markdown("""
         color: #ffffff !important;
     }
 
+    /* ---------------------------------------------------------------------- */
+    /* STYLISATION DU CHAMP DE RECHERCHE SIREN (Fond Sombre + Texte Blanc)   */
+    /* ---------------------------------------------------------------------- */
+    div[data-baseweb="input"] {
+        background-color: #16191d !important;
+        border: 1px solid #232830 !important;
+        border-radius: 10px !important;
+    }
+
+    div[data-baseweb="input"] input {
+        color: #ffffff !important;
+        background-color: transparent !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-baseweb="input"] input::placeholder {
+        color: #64748b !important;
+    }
+
     /* Header & Branding responsive (clamp) */
     .header-container {
         display: flex;
@@ -218,19 +237,21 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. SCORECARDS XXL (RESPONSIVE)                                         */
+    /* 4. SCORECARDS XXL (HAUTEUR ET ALIGNEMENT UNIFORMES)                    */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
         background: #18181B !important;
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
-        padding: 1.2rem 1.2rem !important;
-        min-height: auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        padding: 1.5rem !important;
+        min-height: 185px !important; /* Force la même hauteur pour toutes les cartes */
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         margin-bottom: 0.8rem;
         transition: all 0.25s ease-in-out !important;
+        box-sizing: border-box !important;
     }
 
     .kpi-card-large:hover {
@@ -295,7 +316,8 @@ st.markdown("""
         }
 
         .kpi-card-large {
-            padding: 1rem !important;
+            padding: 1.2rem !important;
+            min-height: auto !important;
         }
 
         .stButton > button {
