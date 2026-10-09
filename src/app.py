@@ -28,7 +28,7 @@ except ModuleNotFoundError:
 # CONFIGURATION STREAMLIT & STYLES CSS
 # ==============================================================================
 st.set_page_config(
-    page_title="RadarEntreprise — B2B Intelligence",
+    page_title="RadarEntreprise",
     page_icon="📡",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -434,9 +434,9 @@ def main():
     # Boutons de navigation ancrés
     st.markdown("""
     <div class="nav-container">
-        <a href="#section-identite" class="nav-btn">🏢 Identité de l'entreprise</a>
-        <a href="#section-indicateurs" class="nav-btn">📊 Indicateurs clé (KPIs)</a>
-        <a href="#section-brutes" class="nav-btn">🔎 Données brutes</a>
+        <a href="#section-identite" class="nav-btn">Identité de l'entreprise</a>
+        <a href="#section-indicateurs" class="nav-btn">Indicateurs clé (KPIs)</a>
+        <a href="#section-brutes" class="nav-btn">Données brutes</a>
     </div>
     """, unsafe_allow_html=True)
 
