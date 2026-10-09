@@ -37,12 +37,16 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Global Page Styling */
+    html {
+        scroll-behavior: smooth;
+    }
+
     .stApp {
         background-color: #0b0d0e;
         color: #e2e8f0;
         font-family: 'Inter', sans-serif;
     }
-    
+
     .main .block-container {
         padding-top: 1.8rem;
         padding-bottom: 2rem;
@@ -82,11 +86,43 @@ st.markdown("""
         font-weight: 700;
     }
 
+    /* Boutons de navigation ancrés */
+    .nav-container {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #16191d;
+        color: #e2e8f0 !important;
+        border: 1px solid #2f3642;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .nav-btn:hover {
+        background-color: #22272e;
+        border-color: #a3e635;
+        color: #a3e635 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(163, 230, 53, 0.15);
+    }
+
     /* ---------------------------------------------------------------------- */
     /* SCORECARDS XXL (2x2) — Verts avec Survol Carré Lumineux */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
-        background: #18181B !important; 
+        background: #18181B !important;
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
         padding: 1.8rem 1.5rem !important;
@@ -248,7 +284,7 @@ def run_dbt_pipeline(siren: str) -> bool:
         "--profiles-dir", str(DBT_PROJECT_DIR),
         "--vars", f"{{target_siren: '{siren}'}}"
     ]
-    
+
     os.environ["DUCKDB_PATH"] = str(DB_PATH)
     res: dbtRunnerResult = runner.invoke(cli_args)
     return res.success
@@ -261,7 +297,7 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
     conn = duckdb.connect(str(DB_PATH))
     try:
         df = conn.sql("""
-            SELECT 
+            SELECT
                 siren,
                 raison_sociale,
                 code_naf,
@@ -283,9 +319,9 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
 
         if not df.empty:
             return df.to_dict(orient="records")[0]
-            
+
         df_raw = conn.sql("""
-            SELECT 
+            SELECT
                 siren,
                 nom_complet as raison_sociale,
                 activite_principale as code_naf,
@@ -394,6 +430,16 @@ def main():
         "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
         "et le dynamisme commercial de n'importe quelle entreprise."
     )
+
+    # Boutons de navigation ancrés
+    st.markdown("""
+    <div class="nav-container">
+        <a href="#section-identite" class="nav-btn">🏢 Identité de l'entreprise</a>
+        <a href="#section-indicateurs" class="nav-btn">📊 Indicateurs clé (KPIs)</a>
+        <a href="#section-brutes" class="nav-btn">🔎 Données brutes</a>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.divider()
 
     # Barre latérale
@@ -436,14 +482,19 @@ def main():
         data = fetch_company_data_from_duckdb(target_siren)
 
         # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
+        st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
         render_company_info(data)
 
         st.divider()
 
         # SECTION 2 : SCORECARDS / KPIS EN PREMIER (Grid 2x2 XXL)
+        st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
         render_kpi_cards(data)
 
         st.divider()
+
+        # SECTION 3 : DETAILS DES METRIQUES BRUTES
+        st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
         with st.expander("🔎 Détails des métriques brutes (DuckDB)"):
             st.json(data)
     else:
