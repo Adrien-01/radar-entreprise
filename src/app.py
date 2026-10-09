@@ -37,7 +37,20 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & TYPOGRAPHIE FLUIDE */
+    /* 0. MASQUAGE DE LA BARRE SUPÉRIEURE & DU FOOTER STREAMLIT               */
+    /* ---------------------------------------------------------------------- */
+    [data-testid="stHeader"] {
+        display: none !important;
+    }
+    #MainMenu {
+        visibility: hidden;
+    }
+    footer {
+        visibility: hidden;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 1. STYLES GLOBAUX & TYPOGRAPHIE FLUIDE                                 */
     /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
@@ -57,10 +70,21 @@ st.markdown("""
         max-width: 1200px;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Styling & Lisibilité du texte */
     [data-testid="stSidebar"] {
         background-color: #121518 !important;
         border-right: 1px solid #1f242d;
+    }
+
+    [data-testid="stSidebar"],
+    [data-testid="stSidebar"] * {
+        color: #e2e8f0 !important;
+    }
+
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
     }
 
     /* Header & Branding responsive (clamp) */
@@ -91,7 +115,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile) */
+    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile)                       */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -135,7 +159,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 3. FICHE D'IDENTITÉ RESPONSIVE (.dark-card) */
+    /* 3. FICHE D'IDENTITÉ RESPONSIVE (.dark-card)                            */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -194,7 +218,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. SCORECARDS XXL (RESPONSIVE) */
+    /* 4. SCORECARDS XXL (RESPONSIVE)                                         */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
         background: #18181B !important;
@@ -245,7 +269,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 5. MEDIA QUERIES MOBILE (Écrans < 768px) */
+    /* 5. MEDIA QUERIES MOBILE (Écrans < 768px)                               */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 768px) {
         .main .block-container {
