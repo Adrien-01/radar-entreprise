@@ -25,18 +25,20 @@ except ModuleNotFoundError:
     from components.kpi_cards import render_kpi_cards
 
 # ==============================================================================
-# CONFIGURATION STREAMLIT & STYLES CSS
+# CONFIGURATION STREAMLIT & STYLES CSS RESPONSIVE
 # ==============================================================================
 st.set_page_config(
-    page_title="RadarEntreprise",
+    page_title="RadarEntreprise — B2B Intelligence",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 
 st.markdown("""
 <style>
-    /* Global Page Styling */
+    /* ---------------------------------------------------------------------- */
+    /* 1. STYLES GLOBAUX & TYPOGRAPHIE FLUIDE */
+    /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
     }
@@ -44,12 +46,15 @@ st.markdown("""
     .stApp {
         background-color: #0b0d0e;
         color: #e2e8f0;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     .main .block-container {
-        padding-top: 1.8rem;
+        padding-top: 1.2rem;
         padding-bottom: 2rem;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 1200px;
     }
 
     /* Sidebar Styling */
@@ -58,7 +63,7 @@ st.markdown("""
         border-right: 1px solid #1f242d;
     }
 
-    /* Typography Header */
+    /* Header & Branding responsive (clamp) */
     .header-container {
         display: flex;
         align-items: baseline;
@@ -67,18 +72,17 @@ st.markdown("""
     }
 
     .brand-title {
-        font-size: 4rem;
+        font-size: clamp(2.2rem, 6vw, 3.8rem);
         font-weight: 800;
         color: #a3e635;
         letter-spacing: -0.5px;
+        line-height: 1.1;
     }
 
-    /* Sous-titre en blanc */
     .white-subtitle {
         color: #ffffff;
-        font-size: 1.1rem !important;
+        font-size: clamp(0.95rem, 2.5vw, 1.1rem) !important;
         font-weight: 500 !important;
-        letter-spacing: normal;
     }
 
     .lime-text {
@@ -86,13 +90,26 @@ st.markdown("""
         font-weight: 700;
     }
 
-    /* Boutons de navigation ancrés */
+    /* ---------------------------------------------------------------------- */
+    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile) */
+    /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
-        gap: 0.75rem;
+        gap: 0.6rem;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        flex-wrap: wrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-container::-webkit-scrollbar {
+        height: 3px;
+    }
+    .nav-container::-webkit-scrollbar-thumb {
+        background: #232830;
+        border-radius: 4px;
     }
 
     .nav-btn {
@@ -102,11 +119,12 @@ st.markdown("""
         background-color: #16191d;
         color: #e2e8f0 !important;
         border: 1px solid #2f3642;
-        padding: 0.5rem 1rem;
-        border-radius: 10px;
-        font-size: 0.9rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
         font-weight: 600;
         text-decoration: none !important;
+        flex-shrink: 0;
         transition: all 0.2s ease-in-out;
     }
 
@@ -114,108 +132,42 @@ st.markdown("""
         background-color: #22272e;
         border-color: #a3e635;
         color: #a3e635 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(163, 230, 53, 0.15);
     }
 
     /* ---------------------------------------------------------------------- */
-    /* SCORECARDS XXL (2x2) — Verts avec Survol Carré Lumineux */
-    /* ---------------------------------------------------------------------- */
-    .kpi-card-large {
-        background: #18181B !important;
-        border: 2px solid #22c55e !important;
-        border-radius: 16px !important;
-        padding: 1.8rem 1.5rem !important;
-        min-height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-        transition: all 0.25s ease-in-out !important;
-        cursor: pointer;
-    }
-
-    /* Effet au survol : Cadre clair très distinct + Halo lumineux blanc/vert */
-    .kpi-card-large:hover {
-        transform: translateY(-4px) scale(1.01);
-        background: #166534 !important; /* Vert légèrement plus sombre */
-        border: 3px solid #a3e635 !important; /* Carré/contour blanc clair net */
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 0 10px rgba(163, 230, 53, 0.4) !important;
-    }
-
-    /* Textes à l'intérieur des cartes XXL */
-    .kpi-title {
-        color: #f0fdf4 !important;
-        font-size: 1.1rem !important;
-        font-weight: 800 !important;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .kpi-body {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        margin: 0.8rem 0;
-    }
-
-    .kpi-value-large {
-        color: #ffffff !important;
-        font-size: 2.8rem !important;
-        font-weight: 900 !important;
-        line-height: 1;
-    }
-
-    .kpi-unit-large {
-        color: #dcfce7 !important;
-        font-size: 1.1rem !important;
-        font-weight: 600;
-    }
-
-    .kpi-footer {
-        color: #bbf7d0 !important;
-        font-size: 0.85rem !important;
-        font-weight: 600;
-    }
-
-    /* Badges contrastés pour fonds verts */
-    .badge-dark {
-        background-color: rgba(0, 0, 0, 0.35) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        padding: 0.4rem 0.8rem;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        font-weight: 700;
-    }
-
-    .badge-red {
-        background-color: #991b1b !important;
-        color: #ffffff !important;
-        border: 1px solid #f85149 !important;
-        padding: 0.4rem 0.8rem;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        font-weight: 700;
-    }
-
-    /* ---------------------------------------------------------------------- */
-    /* HOVER EFFECT : FICHE IDENTITÉ D'ENTREPRISE (.dark-card) */
+    /* 3. FICHE D'IDENTITÉ RESPONSIVE (.dark-card) */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
         border: 1.5px solid #232830;
         border-radius: 16px;
-        padding: 1.5rem;
+        padding: 1.25rem;
         margin-bottom: 1.2rem;
         transition: all 0.3s ease;
     }
 
-    /* Survol néon vert pour le cadre d'identité */
+    .dark-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+        flex-wrap: wrap;
+    }
+
+    .dark-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        background: #0e1013;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid #1f242d;
+    }
+
     .dark-card:hover {
-        transform: translateY(-4px);
         border-color: #a3e635 !important;
-        box-shadow: 0 0 20px rgba(163, 230, 53, 0.25) !important;
+        box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
     /* Badges Fiche d'identité */
@@ -223,20 +175,114 @@ st.markdown("""
         background-color: rgba(163, 230, 53, 0.15);
         color: #a3e635;
         border: 1px solid #a3e635;
-        padding: 0.35rem 0.85rem;
+        padding: 0.3rem 0.75rem;
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
+        white-space: nowrap;
     }
 
     .badge-inactive {
         background-color: rgba(248, 81, 73, 0.15);
         color: #f85149;
         border: 1px solid #f85149;
-        padding: 0.35rem 0.85rem;
+        padding: 0.3rem 0.75rem;
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 4. SCORECARDS XXL (RESPONSIVE) */
+    /* ---------------------------------------------------------------------- */
+    .kpi-card-large {
+        background: #18181B !important;
+        border: 2px solid #22c55e !important;
+        border-radius: 16px !important;
+        padding: 1.2rem 1.2rem !important;
+        min-height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 0.8rem;
+        transition: all 0.25s ease-in-out !important;
+    }
+
+    .kpi-card-large:hover {
+        background: #166534 !important;
+        border: 2.5px solid #a3e635 !important;
+        box-shadow: 0 0 20px rgba(163, 230, 53, 0.3) !important;
+    }
+
+    .kpi-title {
+        color: #f0fdf4 !important;
+        font-size: 0.95rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .kpi-body {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin: 0.6rem 0;
+        flex-wrap: wrap;
+    }
+
+    .kpi-value-large {
+        color: #ffffff !important;
+        font-size: clamp(2rem, 5vw, 2.8rem) !important;
+        font-weight: 900 !important;
+        line-height: 1;
+    }
+
+    .kpi-unit-large {
+        color: #dcfce7 !important;
+        font-size: 0.95rem !important;
+        font-weight: 600;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 5. MEDIA QUERIES MOBILE (Écrans < 768px) */
+    /* ---------------------------------------------------------------------- */
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding-top: 0.8rem;
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+        }
+
+        .dark-card {
+            padding: 1rem;
+        }
+
+        .dark-card-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            padding: 0.8rem;
+        }
+
+        .dark-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .kpi-card-large {
+            padding: 1rem !important;
+        }
+
+        .stButton > button {
+            width: 100% !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dark-card-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Custom Buttons */
@@ -253,12 +299,11 @@ st.markdown("""
     .stButton > button:hover {
         background-color: #bef264 !important;
         box-shadow: 0 0 15px rgba(163, 230, 53, 0.4) !important;
-        transform: scale(1.02);
     }
 
-    /* Divider styling */
     hr {
         border-color: #1f242d !important;
+        margin: 1.2rem 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -372,7 +417,7 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
 
 def render_company_info(data: dict):
     """
-    Affichage de la fiche d'identité administrative et opérationnelle.
+    Affichage responsive de la fiche d'identité administrative et opérationnelle.
     """
     statut = data.get("statut_administratif", "Actif")
     is_active = statut.lower() in ["actif", "a", "en activité"]
@@ -380,37 +425,37 @@ def render_company_info(data: dict):
 
     st.markdown(f"""
     <div class="dark-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div class="dark-card-header">
             <div>
-                <h2 style="margin: 0; color: #ffffff; font-size: 1.6rem;">🏢 {data.get('raison_sociale', 'Raison sociale inconnue')}</h2>
-                <span style="color: #8b949e; font-size: 0.9rem;">SIREN : <strong class="lime-text">{data.get('siren')}</strong></span>
+                <h2 style="margin: 0; color: #ffffff; font-size: clamp(1.2rem, 3.5vw, 1.6rem);">◈ {data.get('raison_sociale', 'Raison sociale inconnue')}</h2>
+                <span style="color: #8b949e; font-size: 0.85rem;">SIREN : <strong class="lime-text">{data.get('siren')}</strong></span>
             </div>
             <div>{statut_badge}</div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; background: #0e1013; padding: 1.2rem; border-radius: 12px; border: 1px solid #1f242d;">
+        <div class="dark-card-grid">
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Date de création</div>
-                <div style="color: #ffffff; font-weight: 600; margin-top: 0.2rem;">{data.get('date_creation', 'N/A')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Date de création</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('date_creation', 'N/A')}</div>
             </div>
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Tranche d'effectifs</div>
-                <div style="color: #ffffff; font-weight: 600; margin-top: 0.2rem;">{data.get('tranche_effectifs', 'Non renseignée')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Tranche d'effectifs</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('tranche_effectifs', 'Non renseignée')}</div>
             </div>
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Code NAF / APE</div>
-                <div style="color: #a3e635; font-weight: 600; margin-top: 0.2rem;">{data.get('code_naf', 'N/A')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Code NAF / APE</div>
+                <div style="color: #a3e635; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('code_naf', 'N/A')}</div>
             </div>
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Activité</div>
-                <div style="color: #ffffff; font-weight: 600; margin-top: 0.2rem;">{data.get('libelle_naf', 'N/A')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Activité</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('libelle_naf', 'N/A')}</div>
             </div>
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Adresse du siège</div>
-                <div style="color: #ffffff; font-weight: 600; margin-top: 0.2rem;">{data.get('adresse_siege', 'N/A')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Adresse du siège</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('adresse_siege', 'N/A')}</div>
             </div>
             <div>
-                <div style="color: #8b949e; font-size: 0.8rem; text-transform: uppercase;">Dirigeants</div>
-                <div style="color: #ffffff; font-weight: 600; margin-top: 0.2rem;">{data.get('dirigeants', 'Non renseignés')}</div>
+                <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">Dirigeants</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 0.9rem; margin-top: 0.2rem;">{data.get('dirigeants', 'Non renseignés')}</div>
             </div>
         </div>
     </div>
@@ -418,11 +463,11 @@ def render_company_info(data: dict):
 
 
 def main():
-    # En-tête : RadarEntreprise (Gros & Vert) + Sous-titre (Blanc)
+    # En-tête : RadarEntreprise responsive
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
-        '<span class="white-subtitle">•  L\'analyse d\'entreprise en un clic</span>'
+        '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -431,12 +476,12 @@ def main():
         "et le dynamisme commercial de n'importe quelle entreprise."
     )
 
-    # Boutons de navigation ancrés
+    # Boutons de navigation ancrés & scrollables sur mobile
     st.markdown("""
     <div class="nav-container">
-        <a href="#section-identite" class="nav-btn">Identité de l'entreprise</a>
-        <a href="#section-indicateurs" class="nav-btn">Indicateurs clé (KPIs)</a>
-        <a href="#section-brutes" class="nav-btn">Données brutes</a>
+        <a href="#section-identite" class="nav-btn">◈ Identité</a>
+        <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
+        <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -487,7 +532,7 @@ def main():
 
         st.divider()
 
-        # SECTION 2 : SCORECARDS / KPIS EN PREMIER (Grid 2x2 XXL)
+        # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
         st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
         render_kpi_cards(data)
 
@@ -495,7 +540,7 @@ def main():
 
         # SECTION 3 : DETAILS DES METRIQUES BRUTES
         st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
-        with st.expander("🔎 Détails des métriques brutes (DuckDB)"):
+        with st.expander("↳ Détails des métriques brutes (DuckDB)"):
             st.json(data)
     else:
         st.info("👈 Entrez un numéro SIREN dans le panneau latéral pour afficher le tableau de bord.")
