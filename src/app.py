@@ -121,6 +121,24 @@ st.markdown("""
         color: #64748b !important;
     }
 
+    /* Bouton loupe discret et élégant */
+    .stButton > button {
+        background-color: #16191d !important;
+        color: #a3e635 !important;
+        font-weight: 700 !important;
+        border-radius: 20px !important;
+        border: 1px solid #232830 !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton > button:hover {
+        background-color: #22272e !important;
+        border-color: #a3e635 !important;
+        color: #a3e635 !important;
+        box-shadow: 0 0 12px rgba(163, 230, 53, 0.2) !important;
+    }
+
     /* Header & Branding responsive */
     .header-container {
         display: flex;
@@ -301,21 +319,6 @@ st.markdown("""
         font-weight: 600;
     }
 
-    .stButton > button {
-        background-color: #a3e635 !important;
-        color: #0b0d0e !important;
-        font-weight: 700 !important;
-        border-radius: 10px !important;
-        border: none !important;
-        padding: 0.5rem 1rem !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .stButton > button:hover {
-        background-color: #bef264 !important;
-        box-shadow: 0 0 15px rgba(163, 230, 53, 0.4) !important;
-    }
-
     hr {
         border-color: #1f242d !important;
         margin: 1.2rem 0 !important;
@@ -452,8 +455,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE (Ciblée rigoureusement par le CSS via son placeholder unique) ---
-    col_input, col_btn = st.columns([4, 1], gap="medium")
+    # --- 1. BARRE DE RECHERCHE (Proportions adaptées pour le bouton loupe) ---
+    col_input, col_btn = st.columns([10, 1], gap="small")
 
     with col_input:
         siren_input = st.text_input(
@@ -464,7 +467,7 @@ def main():
             placeholder="N° SIREN (9 chiffres)..."
         )
     with col_btn:
-        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+        btn_analyze = st.button("🔍", type="secondary", use_container_width=True, help="Lancer l'analyse")
 
     # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
@@ -531,7 +534,7 @@ def main():
                 "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
             )
     else:
-        st.info("👆 Entrez un numéro SIREN ci-dessus et cliquez sur **Lancer l'analyse** pour afficher le tableau de bord.")
+        st.info("👆 Entrez un numéro SIREN ci-dessus et cliquez sur la loupe pour afficher le tableau de bord.")
 
 
 if __name__ == "__main__":
