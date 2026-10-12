@@ -65,9 +65,8 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Compenser l'espace en haut pour laisser la place à la barre fixe */
     .main .block-container {
-        padding-top: 5.5rem !important;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -75,21 +74,18 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE FIXE EN HAUT (Ciblage du premier bloc horizontal)   */
+    /* BARRE DE RECHERCHE STICKY (COLLANTE AU DÉFILEMENT)                      */
     /* ---------------------------------------------------------------------- */
-    [data-testid="stHorizontalBlock"]:first-of-type {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        background-color: rgba(11, 13, 14, 0.95) !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        z-index: 99999 !important;
-        padding: 12px 24px !important;
-        box-sizing: border-box !important;
-        border-bottom: 1px solid #232830 !important;
-        margin: 0 !important;
+    .sticky-search-wrapper {
+        position: sticky;
+        top: 0;
+        z-index: 99999;
+        background-color: rgba(11, 13, 14, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 10px 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #232830;
     }
 
     /* Champ input avec loupe intégrée façon Deezer */
@@ -475,7 +471,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- BARRE DE RECHERCHE FIXE EN HAUT (PREMIER BLOC DE LA PAGE) ---
+    # --- BARRE DE RECHERCHE STICKY TOUT EN HAUT (STYLE DEEZER AVEC LOUPE) ---
+    st.markdown('<div class="sticky-search-wrapper">', unsafe_allow_html=True)
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -484,10 +481,11 @@ def main():
             value=st.session_state.get("last_siren", "123456789"),
             max_chars=9,
             label_visibility="collapsed",
-            placeholder="Rechercher par n° SIREN (ex: 123456789)..."
+            placeholder="Artistes, titres, podcasts ou n° SIREN..."
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # En-tête : RadarEntreprise responsive
     st.markdown(
