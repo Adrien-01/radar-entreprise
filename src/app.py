@@ -24,7 +24,7 @@ except ModuleNotFoundError:
     from ingestion.fetch_api import ingest_siren_data_to_duckdb
     from components.kpi_cards import render_kpi_cards
 
-# Gestion de l'état d'affichage du panneau personnalisé
+# Gestion de l'état d'affichage de la colonne latérale
 if "show_sidebar" not in st.session_state:
     st.session_state.show_sidebar = True
 
@@ -74,16 +74,16 @@ st.markdown("""
         padding-bottom: 2rem;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
-        max-width: 1200px;
+        max-width: 1400px;
     }
 
-    /* Panneau de recherche personnalisé */
+    /* Panneau latéral personnalisé */
     .custom-sidebar {
         background-color: #121518;
         border: 1px solid #1f242d;
         border-radius: 16px;
         padding: 1.2rem;
-        margin-bottom: 1.5rem;
+        height: 100%;
     }
 
     /* ---------------------------------------------------------------------- */
@@ -466,98 +466,114 @@ def render_company_info(data: dict):
 
 
 def main():
-    # Bouton avec flèche pour afficher ou masquer le panneau latéral de recherche
+    # Bouton principal avec flèche pour afficher/masquer le panneau latéral gauche
     btn_text = "◀ Masquer la recherche" if st.session_state.show_sidebar else "▶ Afficher la recherche"
     if st.button(btn_text):
         st.session_state.show_sidebar = not st.session_state.show_sidebar
         st.rerun()
 
-    # En-tête : RadarEntreprise responsive
-    st.markdown(
-        '<div class="header-container">'
-        '<span class="brand-title">RadarEntreprise</span>'
-        '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-    st.caption(
-        "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
-        "et le dynamisme commercial de n'importe quelle entreprise."
-    )
-
-    # Boutons de navigation ancrés & scrollables sur mobile
-    st.markdown("""
-    <div class="nav-container">
-        <a href="#section-identite" class="nav-btn">◈ Identité</a>
-        <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
-        <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
-    </div>
-    """, unsafe_allow_html=True)
-
     st.divider()
 
-    # Gestion de l'affichage dynamique du panneau de recherche personnalisé
+    # Structure en deux colonnes : Gauche (Panneau de recherche) / Droite (Contenu)
+    if st.session_state.show_sidebar:
+        col_sidebar, col_main = st.columns([1, 3], gap="medium")
+    else:
+        # Si masqué, la colonne principale prend toute la largeur
+        col_sidebar = None
+        col_main = st.container()
+
+    # --- COLONNE LATÉRALE DE RECHERCHE ---
     siren_input = "123456789"
     btn_analyze = False
 
-    if st.session_state.show_sidebar:
-        st.markdown('<div class="custom-sidebar">', unsafe_allow_html=True)
-        st.subheader("🔍 Recherche Entreprise")
-        siren_input = st.text_input(
-            "Numéro SIREN (9 chiffres)",
-            value="123456789",
-            max_chars=9,
-            help="Saisissez un numéro SIREN pour analyser l'entreprise."
+    if col_sidebar:
+        with col_sidebar:
+            st.markdown('<div class="custom-sidebar">', unsafe_allow_html=True)
+            st.header("Recherche Entreprise")
+            siren_input = st.text_input(
+                "Numéro SIREN (9 chiffres)",
+                value="123456789",
+                max_chars=9,
+                help="Saisissez un numéro SIREN pour analyser l'entreprise."
+            )
+            btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+
+            st.divider()
+            st.info(
+                "**RadarEntreprise** ingère en temps réel les données des API publiques "
+                "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
+            )
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # --- COLONNE PRINCIPALE (TABLEAU DE BORD) ---
+    with col_main:
+        # En-tête : RadarEntreprise responsive
+        st.markdown(
+            '<div class="header-container">'
+            '<span class="brand-title">RadarEntreprise</span>'
+            '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
+            '</div>',
+            unsafe_allow_html=True,
         )
-        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
-
-        st.divider()
-        st.info(
-            "**RadarEntreprise** ingère en temps réel les données des API publiques "
-            "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
+        st.caption(
+            "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
+            "et le dynamisme commercial de n'importe quelle entreprise."
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Exécution de la recherche
-    if btn_analyze or "last_siren" in st.session_state:
-        target_siren = siren_input.strip()
-
-        if len(target_siren) != 9 or not target_siren.isdigit():
-            st.error("⚠️ Veuillez entrer un numéro SIREN valide de 9 chiffres.")
-            return
-
-        st.session_state["last_siren"] = target_siren
-
-        # 1. Ingestion API & Pipeline dbt
-        with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
-            conn = duckdb.connect(str(DB_PATH))
-            ingest_siren_data_to_duckdb(target_siren, conn)
-            conn.close()
-
-            if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
-                run_dbt_pipeline(target_siren)
-
-        # 2. Lecture des données & Rendu UI
-        data = fetch_company_data_from_duckdb(target_siren)
-
-        # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
-        st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
-        render_company_info(data)
+        # Boutons de navigation ancrés & scrollables sur mobile
+        st.markdown("""
+        <div class="nav-container">
+            <a href="#section-identite" class="nav-btn">◈ Identité</a>
+            <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
+            <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
+        </div>
+        """, unsafe_allow_html=True)
 
         st.divider()
 
-        # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
-        st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
-        render_kpi_cards(data)
+        # Exécution de la recherche
+        if btn_analyze or "last_siren" in st.session_state:
+            target_siren = siren_input.strip()
 
-        st.divider()
+            if len(target_siren) != 9 or not target_siren.isdigit():
+                st.error("⚠️ Veuillez entrer un numéro SIREN valide de 9 chiffres.")
+                return
 
-        # SECTION 3 : DETAILS DES METRIQUES BRUTES
-        st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
-        with st.expander("↳ Détails des métriques brutes (DuckDB)"):
-            st.json(data)
-    else:
-        st.info("👆 Cliquez sur 'Afficher la recherche' ci-dessus pour entrer un numéro SIREN.")
+            st.session_state["last_siren"] = target_siren
+
+            # 1. Ingestion API & Pipeline dbt
+            with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
+                conn = duckdb.connect(str(DB_PATH))
+                ingest_siren_data_to_duckdb(target_siren, conn)
+                conn.close()
+
+                if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
+                    run_dbt_pipeline(target_siren)
+
+            # 2. Lecture des données & Rendu UI
+            data = fetch_company_data_from_duckdb(target_siren)
+
+            # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
+            st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
+            render_company_info(data)
+
+            st.divider()
+
+            # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
+            st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
+            render_kpi_cards(data)
+
+            st.divider()
+
+            # SECTION 3 : DETAILS DES METRIQUES BRUTES
+            st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
+            with st.expander("↳ Détails des métriques brutes (DuckDB)"):
+                st.json(data)
+        else:
+            if not st.session_state.show_sidebar:
+                st.info("👈 Cliquez sur '▶ Afficher la recherche' en haut pour ouvrir le panneau de recherche.")
+            else:
+                st.info("👈 Entrez un numéro SIREN dans le panneau à gauche pour afficher le tableau de bord.")
 
 
 if __name__ == "__main__":
