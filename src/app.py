@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE (PC par défaut)      */
+    /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE                      */
     /* ---------------------------------------------------------------------- */
     html, body {
         scroll-behavior: smooth;
@@ -67,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5.5rem !important; /* Laisse l'espace sous la barre fixe sur PC */
+        padding-top: 5.5rem !important;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -75,7 +75,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. CIBLAGE STRICT : UNIQUEMENT LE BLOC CONTENANT LA RECHERCHE SIREN   */
+    /* 2. BARRE FIXE & GRILLE DES BOUTONS                                     */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
         position: fixed !important;
@@ -94,17 +94,9 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* Centrage du contenu à l'intérieur de la barre fixe */
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
         max-width: 1200px;
         margin: 0 auto;
-    }
-
-    /* Alignement vertical des boutons dans la barre fixe (PC) */
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2),
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
-        display: flex;
-        align-items: flex-end;
     }
 
     /* Champ input avec loupe intégrée */
@@ -128,7 +120,7 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Boutons harmonisés avec le style .dark-card (PC) */
+    /* Style général des boutons */
     .stButton > button {
         background-color: #16191d !important;
         color: #ffffff !important;
@@ -149,45 +141,61 @@ st.markdown("""
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
+    /* Ciblage spécifique pour forcer le bouton X à rester petit et carré */
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) button {
+        max-width: 50px !important;
+        min-width: 40px !important;
+        padding: 0 !important;
+        font-size: 1.1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
     /* ---------------------------------------------------------------------- */
-    /* 5. MEDIA QUERIES : ADAPTATION SMARTPHONE (< 768px) (CSS GRID)          */
+    /* 3. MEDIA QUERIES : OPTIMISATION MOBILE (< 768px)                       */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 768px) {
         .main .block-container {
-            padding-top: 7.5rem !important; /* Espace adapté pour la barre sur 2 lignes */
+            padding-top: 7.2rem !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
 
-        /* Grille mobile à 2 colonnes : Input en haut, Croix (plus petite) et Recherche en bas */
+        /* Organisation de la barre fixe en grille sur mobile : Input en haut, Croix + Recherche en bas sur une ligne */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
             display: grid !important;
-            grid-template-columns: 50px 1fr !important;
+            grid-template-columns: 46px 1fr !important;
             gap: 8px !important;
             padding: 10px 1rem !important;
         }
 
-        /* L'input SIREN s'étale sur toute la largeur de la première ligne */
+        /* L'input SIREN prend toute la largeur sur la ligne 1 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
             grid-column: 1 / 3 !important;
             width: 100% !important;
             max-width: 100% !important;
         }
 
-        /* Le bouton Croix (colonne 2 dans le code, placée en premier sur la ligne 2) */
+        /* Le bouton Croix (colonne 2) se met à gauche sur la ligne 2 avec une taille réduite fixe */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
             grid-column: 1 / 2 !important;
-            width: 100% !important;
+            width: 46px !important;
         }
 
-        /* Le bouton Recherche (colonne 3 dans le code, placée à droite de la croix) */
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) button {
+            width: 46px !important;
+            max-width: 46px !important;
+            height: 40px !important;
+        }
+
+        /* Le bouton Recherche (colonne 3) prend tout le reste de la ligne 2 à droite */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
             grid-column: 2 / 3 !important;
             width: 100% !important;
         }
 
-        /* Réduction de la hauteur des boutons sur mobile */
-        .stButton > button {
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) button {
             height: 40px !important;
             padding: 0.3rem 0.5rem !important;
             font-size: 0.9rem !important;
@@ -235,7 +243,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 3. NAVIGATION PAR ANCRES                                               */
+    /* 4. NAVIGATION PAR ANCRES                                               */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -279,7 +287,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. FICHE D'IDENTITÉ RESPONSIVE & SCORECARDS                            */
+    /* 5. FICHE D'IDENTITÉ RESPONSIVE & SCORECARDS                            */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -523,7 +531,7 @@ def render_company_info(data: dict):
 
 def main():
     # --- 1. BARRE DE RECHERCHE & BOUTONS (Ordre : Input, Croix, Recherche) ---
-    col_input, col_clear, col_btn = st.columns([6.5, 1, 2], gap="small")
+    col_input, col_clear, col_btn = st.columns([7, 1, 2], gap="small")
 
     with col_input:
         siren_input = st.text_input(
