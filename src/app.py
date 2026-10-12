@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE                      */
+    /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE (PC par défaut)      */
     /* ---------------------------------------------------------------------- */
     html, body {
         scroll-behavior: smooth;
@@ -67,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5.5rem !important; /* Laisse l'espace sous la barre fixe */
+        padding-top: 5.5rem !important; /* Laisse l'espace sous la barre fixe sur PC */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -128,7 +128,7 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Boutons harmonisés avec le style .dark-card */
+    /* Boutons harmonisés avec le style .dark-card (PC) */
     .stButton > button {
         background-color: #16191d !important;
         color: #ffffff !important;
@@ -147,6 +147,44 @@ st.markdown("""
         border-color: #a3e635 !important;
         color: #a3e635 !important;
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* 5. MEDIA QUERIES : OPTIMISATION MOBILE (< 768px)                       */
+    /* ---------------------------------------------------------------------- */
+    @media (max-width: 768px) {
+        /* Réduit l'espace haut de la page pour ne pas masquer le titre */
+        .main .block-container {
+            padding-top: 4.2rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* Rend la barre fixe plus compacte sur mobile */
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
+            padding: 8px 1rem !important;
+        }
+
+        /* Réduit la hauteur des boutons et de l'input sur mobile */
+        .stButton > button {
+            height: 38px !important;
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.85rem !important;
+            border-radius: 12px !important;
+        }
+
+        div[data-baseweb="input"] {
+            height: 38px !important;
+            min-height: 38px !important;
+            border-radius: 16px !important;
+            background-position: 10px center !important;
+        }
+
+        div[data-baseweb="input"] input {
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+            font-size: 0.9rem !important;
+        }
     }
 
     /* Header & Branding responsive */
