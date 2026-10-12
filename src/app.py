@@ -100,6 +100,12 @@ st.markdown("""
         margin: 0 auto;
     }
 
+    /* Alignement vertical de la colonne du bouton dans la barre fixe */
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
+        display: flex;
+        align-items: flex-end;
+    }
+
     /* Champ input avec loupe intégrée */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
@@ -121,22 +127,25 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Bouton loupe discret et élégant */
+    /* Bouton recherche harmonisé avec le style .dark-card */
     .stButton > button {
         background-color: #16191d !important;
-        color: #a3e635 !important;
-        font-weight: 700 !important;
-        border-radius: 20px !important;
-        border: 1px solid #232830 !important;
-        padding: 0.5rem 1rem !important;
-        transition: all 0.2s ease !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 16px !important;
+        border: 1.5px solid #232830 !important;
+        padding: 0.6rem 1rem !important;
+        height: 46px !important;
+        transition: all 0.3s ease !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
     }
 
     .stButton > button:hover {
-        background-color: #22272e !important;
+        background-color: #16191d !important;
         border-color: #a3e635 !important;
         color: #a3e635 !important;
-        box-shadow: 0 0 12px rgba(163, 230, 53, 0.2) !important;
+        box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
     /* Header & Branding responsive */
@@ -455,7 +464,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE (Proportions adaptées pour le bouton loupe) ---
+    # --- 1. BARRE DE RECHERCHE ---
     col_input, col_btn = st.columns([10, 1], gap="small")
 
     with col_input:
