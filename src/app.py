@@ -53,10 +53,11 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS EN HAUT         */
+    /* 1. SUPPRESSION TOTALE DES ESPACES HAUTS                                */
     /* ---------------------------------------------------------------------- */
-    html {
+    html, body {
         scroll-behavior: smooth;
+        background-color: #0b0d0e !important;
     }
 
     .stApp {
@@ -66,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 0rem !important; /* Collé tout en haut */
+        padding-top: 5rem !important; /* Compense la hauteur de la barre fixe */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -74,33 +75,31 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE FIXE ABSOLUE (BLOC DÉDIÉ)                           */
+    /* 2. CIBLAGE DU TOUT PREMIER BLOC (LA BARRE DE RECHERCHE) POUR LA FIXER  */
     /* ---------------------------------------------------------------------- */
-    div#sticky-search-container {
+    .main .block-container > div:first-child,
+    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important;
+        right: 0 !important;
+        width: 100% !important;
         z-index: 999999 !important;
-        background-color: rgba(11, 13, 14, 0.98) !important;
+        background-color: #0b0d0e !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        border-bottom: 1px solid #232830 !important;
-        padding: 12px 2rem !important;
+        padding: 10px 2rem !important;
         box-sizing: border-box !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+        border-bottom: 1px solid #232830 !important;
+        margin: 0 !important;
     }
 
-    /* Ajustement de la grille Streamlit à l'intérieur de la barre fixe */
-    div#sticky-search-container [data-testid="stHorizontalBlock"] {
+    /* Centrage du contenu de la barre fixe à 1200px max */
+    .main .block-container > div:first-child [data-testid="stHorizontalBlock"],
+    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child [data-testid="stHorizontalBlock"] {
         max-width: 1200px;
         margin: 0 auto;
-        align-items: center;
-    }
-
-    /* Espace de compensation pour que le contenu ne passe pas sous la barre fixe */
-    .content-wrapper {
-        margin-top: 85px;
+        width: 100%;
     }
 
     /* Champ input avec loupe intégrée */
@@ -130,7 +129,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     .brand-title {
@@ -153,7 +152,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. NAVIGATION PAR ANCRES                                               */
+    /* 3. NAVIGATION PAR ANCRES                                               */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -197,7 +196,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 3. FICHE D'IDENTITÉ RESPONSIVE                                         */
+    /* 4. FICHE D'IDENTITÉ RESPONSIVE & SCORECARDS                            */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -232,7 +231,6 @@ st.markdown("""
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
-    /* Badges Fiche d'identité */
     .badge-active {
         background-color: rgba(163, 230, 53, 0.15);
         color: #a3e635;
@@ -255,9 +253,6 @@ st.markdown("""
         white-space: nowrap;
     }
 
-    /* ---------------------------------------------------------------------- */
-    /* 4. SCORECARDS XXL                                                      */
-    /* ---------------------------------------------------------------------- */
     .kpi-card-large {
         background: #18181B !important;
         border: 2px solid #22c55e !important;
@@ -308,7 +303,6 @@ st.markdown("""
         font-weight: 600;
     }
 
-    /* Custom Buttons */
     .stButton > button {
         background-color: #a3e635 !important;
         color: #0b0d0e !important;
@@ -342,9 +336,6 @@ DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 def run_dbt_pipeline(siren: str) -> bool:
-    """
-    Exécute le pipeline dbt Core en lui transmettant la variable SIREN.
-    """
     runner = dbtRunner()
     cli_args = [
         "build",
@@ -352,35 +343,20 @@ def run_dbt_pipeline(siren: str) -> bool:
         "--profiles-dir", str(DBT_PROJECT_DIR),
         "--vars", f"{{target_siren: '{siren}'}}"
     ]
-
     os.environ["DUCKDB_PATH"] = str(DB_PATH)
     res: dbtRunnerResult = runner.invoke(cli_args)
     return res.success
 
 
 def fetch_company_data_from_duckdb(siren: str) -> dict:
-    """
-    Lit l'identité complète et les KPIs de l'entreprise depuis DuckDB.
-    """
     conn = duckdb.connect(str(DB_PATH))
     try:
         df = conn.sql("""
             SELECT
-                siren,
-                raison_sociale,
-                code_naf,
-                libelle_naf,
-                tranche_effectifs,
-                statut_administratif,
-                adresse_siege,
-                dirigeants,
-                date_creation,
-                flag_bodacc,
-                nb_mouvements_gov,
-                ratio_creation_fermeture,
-                qualification_tension,
-                nb_marches_boamp,
-                profil_commande_publique
+                siren, raison_sociale, code_naf, libelle_naf, tranche_effectifs,
+                statut_administratif, adresse_siege, dirigeants, date_creation,
+                flag_bodacc, nb_mouvements_gov, ratio_creation_fermeture,
+                qualification_tension, nb_marches_boamp, profil_commande_publique
             FROM mart_enterprise_kpis
             WHERE siren = ?
         """, params=[siren]).df()
@@ -390,15 +366,10 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
 
         df_raw = conn.sql("""
             SELECT
-                siren,
-                nom_complet as raison_sociale,
-                activite_principale as code_naf,
-                'Libellé APE' as libelle_naf,
-                tranche_effectifs_salarie as tranche_effectifs,
-                statut_administratif,
-                adresse_postale as adresse_siege,
-                'Dirigeants répertoriés' as dirigeants,
-                date_creation
+                siren, nom_complet as raison_sociale, activite_principale as code_naf,
+                'Libellé APE' as libelle_naf, tranche_effectifs_salarie as tranche_effectifs,
+                statut_administratif, adresse_postale as adresse_siege,
+                'Dirigeants répertoriés' as dirigeants, date_creation
             FROM raw_sirene
             WHERE siren = ?
         """, params=[siren]).df()
@@ -439,9 +410,6 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
 
 
 def render_company_info(data: dict):
-    """
-    Affichage responsive de la fiche d'identité administrative et opérationnelle.
-    """
     statut = data.get("statut_administratif", "Actif")
     is_active = statut.lower() in ["actif", "a", "en activité"]
     statut_badge = '<span class="badge-active">🟢 En activité</span>' if is_active else '<span class="badge-inactive">🔴 Cessation / Inactif</span>'
@@ -486,8 +454,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE FIXE DÉDIÉE ---
-    st.markdown('<div id="sticky-search-container">', unsafe_allow_html=True)
+    # --- 1. BARRE DE RECHERCHE (Placée en tout premier, elle devient automatiquement fixe via le CSS) ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -496,16 +463,12 @@ def main():
             value=st.session_state.get("last_siren", "123456789"),
             max_chars=9,
             label_visibility="collapsed",
-            placeholder="Artistes, titres, podcasts ou n° SIREN..."
+            placeholder="N° SIREN (9 chiffres)..."
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    # Conteneur de compensation pour éviter le chevauchement sous la barre fixe
-    st.markdown('<div class="content-wrapper"></div>', unsafe_allow_html=True)
-
-    # --- 2. EN-TÊTE DE LA PAGE ---
+    # --- 2. EN-TÊTE DE LA PAGE (Défilant sous la barre de recherche) ---
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
@@ -539,7 +502,6 @@ def main():
         if len(target_siren) != 9 or not target_siren.isdigit():
             st.error("⚠️ Veuillez entrer un numéro SIREN valide de 9 chiffres.")
         else:
-            # 1. Ingestion API & Pipeline dbt
             with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
                 conn = duckdb.connect(str(DB_PATH))
                 ingest_siren_data_to_duckdb(target_siren, conn)
@@ -548,29 +510,24 @@ def main():
                 if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
                     run_dbt_pipeline(target_siren)
 
-            # 2. Lecture des données & Rendu UI
             data = fetch_company_data_from_duckdb(target_siren)
 
-            # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
             st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
             render_company_info(data)
 
             st.divider()
 
-            # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
             st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
             render_kpi_cards(data)
 
             st.divider()
 
-            # SECTION 3 : DETAILS DES METRIQUES BRUTES
             st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
             with st.expander("↳ Détails des métriques brutes (DuckDB)"):
                 st.json(data)
 
             st.divider()
 
-            # Message d'information sur la provenance des sources affiché après l'analyse
             st.info(
                 "**RadarEntreprise** ingère en temps réel les données des API publiques "
                 "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
