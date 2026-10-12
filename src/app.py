@@ -16,9 +16,17 @@ import streamlit as st
 import duckdb
 from dbt.cli.main import dbtRunner, dbtRunnerResult
 
-# Gestion de l'état de la sidebar dans st.session_state
-if "sidebar_state" not in st.session_state:
-    st.session_state.sidebar_state = "expanded"
+# Imports des modules internes
+try:
+    from src.ingestion.fetch_api import ingest_siren_data_to_duckdb
+    from src.components.kpi_cards import render_kpi_cards
+except ModuleNotFoundError:
+    from ingestion.fetch_api import ingest_siren_data_to_duckdb
+    from components.kpi_cards import render_kpi_cards
+
+# Gestion de l'état d'affichage du panneau personnalisé
+if "show_sidebar" not in st.session_state:
+    st.session_state.show_sidebar = True
 
 # ==============================================================================
 # CONFIGURATION STREAMLIT & STYLES CSS RESPONSIVE
@@ -27,16 +35,19 @@ st.set_page_config(
     page_title="RadarEntreprise",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
     /* ---------------------------------------------------------------------- */
-    /* 0. MASQUAGE DES ELEMENTS SUPERFLUS STREAMLIT                         */
+    /* 0. MASQUAGE TOTAL DE LA SIDEBAR NATIVE & DU HEADER STREAMLIT           */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHeader"] {
-        background: transparent !important;
+        display: none !important;
+    }
+    [data-testid="stSidebar"] {
+        display: none !important;
     }
     #MainMenu {
         visibility: hidden;
@@ -66,21 +77,13 @@ st.markdown("""
         max-width: 1200px;
     }
 
-    /* Sidebar Styling & Lisibilité du texte */
-    [data-testid="stSidebar"] {
-        background-color: #121518 !important;
-        border-right: 1px solid #1f242d;
-    }
-
-    [data-testid="stSidebar"],
-    [data-testid="stSidebar"] * {
-        color: #e2e8f0 !important;
-    }
-
-    [data-testid="stSidebar"] h1,
-    [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3 {
-        color: #ffffff !important;
+    /* Panneau de recherche personnalisé */
+    .custom-sidebar {
+        background-color: #121518;
+        border: 1px solid #1f242d;
+        border-radius: 16px;
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
     /* ---------------------------------------------------------------------- */
@@ -285,48 +288,6 @@ st.markdown("""
         font-weight: 600;
     }
 
-    /* ---------------------------------------------------------------------- */
-    /* 5. MEDIA QUERIES MOBILE (Écrans < 768px)                               */
-    /* ---------------------------------------------------------------------- */
-    @media (max-width: 768px) {
-        .main .block-container {
-            padding-top: 0.8rem;
-            padding-left: 0.6rem !important;
-            padding-right: 0.6rem !important;
-        }
-
-        .dark-card {
-            padding: 1rem;
-        }
-
-        .dark-card-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-            padding: 0.8rem;
-        }
-
-        .dark-card-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .kpi-card-large {
-            padding: 1.2rem !important;
-            min-height: auto !important;
-        }
-
-        .stButton > button {
-            width: 100% !important;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .dark-card-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
     /* Custom Buttons */
     .stButton > button {
         background-color: #a3e635 !important;
@@ -505,13 +466,11 @@ def render_company_info(data: dict):
 
 
 def main():
-    # Bouton dédié pour afficher/masquer la barre latérale en haut à gauche
-    col_toggle, col_empty = st.columns([1, 6])
-    with col_toggle:
-        toggle_label = "📂 Ouvrir la recherche" if st.session_state.sidebar_state == "collapsed" else "📁 Fermer la recherche"
-        if st.button(toggle_label, use_container_width=True):
-            st.session_state.sidebar_state = "expanded" if st.session_state.sidebar_state == "collapsed" else "collapsed"
-            st.rerun()
+    # Bouton avec flèche pour afficher ou masquer le panneau latéral de recherche
+    btn_text = "◀ Masquer la recherche" if st.session_state.show_sidebar else "▶ Afficher la recherche"
+    if st.button(btn_text):
+        st.session_state.show_sidebar = not st.session_state.show_sidebar
+        st.rerun()
 
     # En-tête : RadarEntreprise responsive
     st.markdown(
@@ -537,9 +496,13 @@ def main():
 
     st.divider()
 
-    # Barre latérale (contrôlée dynamiquement)
-    with st.sidebar:
-        st.header("Recherche Entreprise")
+    # Gestion de l'affichage dynamique du panneau de recherche personnalisé
+    siren_input = "123456789"
+    btn_analyze = False
+
+    if st.session_state.show_sidebar:
+        st.markdown('<div class="custom-sidebar">', unsafe_allow_html=True)
+        st.subheader("🔍 Recherche Entreprise")
         siren_input = st.text_input(
             "Numéro SIREN (9 chiffres)",
             value="123456789",
@@ -553,6 +516,7 @@ def main():
             "**RadarEntreprise** ingère en temps réel les données des API publiques "
             "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
         )
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # Exécution de la recherche
     if btn_analyze or "last_siren" in st.session_state:
@@ -593,7 +557,7 @@ def main():
         with st.expander("↳ Détails des métriques brutes (DuckDB)"):
             st.json(data)
     else:
-        st.info("👈 Entrez un numéro SIREN dans le panneau latéral pour afficher le tableau de bord.")
+        st.info("👆 Cliquez sur 'Afficher la recherche' ci-dessus pour entrer un numéro SIREN.")
 
 
 if __name__ == "__main__":
