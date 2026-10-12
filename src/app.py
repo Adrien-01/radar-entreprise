@@ -77,13 +77,12 @@ st.markdown("""
         max-width: 1400px;
     }
 
-    /* Panneau latéral personnalisé */
+    /* Panneau latéral personnalisé plus fin et épuré */
     .custom-sidebar {
         background-color: #121518;
         border: 1px solid #1f242d;
-        border-radius: 16px;
-        padding: 1.2rem;
-        height: 100%;
+        border-radius: 14px;
+        padding: 1rem;
     }
 
     /* ---------------------------------------------------------------------- */
@@ -293,9 +292,9 @@ st.markdown("""
         background-color: #a3e635 !important;
         color: #0b0d0e !important;
         font-weight: 700 !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         border: none !important;
-        padding: 0.6rem 1.2rem !important;
+        padding: 0.5rem 1rem !important;
         transition: all 0.2s ease !important;
     }
 
@@ -466,30 +465,32 @@ def render_company_info(data: dict):
 
 
 def main():
-    # Bouton principal avec flèche pour afficher/masquer le panneau latéral gauche
-    btn_text = "◀ Masquer la recherche" if st.session_state.show_sidebar else "▶ Afficher la recherche"
-    if st.button(btn_text):
-        st.session_state.show_sidebar = not st.session_state.show_sidebar
-        st.rerun()
-
-    st.divider()
-
-    # Structure en deux colonnes : Gauche (Panneau de recherche) / Droite (Contenu)
+    # Définition des largeurs de colonnes : Si la sidebar est fermée, on ajuste
     if st.session_state.show_sidebar:
-        col_sidebar, col_main = st.columns([1, 3], gap="medium")
+        col_sidebar, col_main = st.columns([1, 4], gap="medium")
     else:
-        # Si masqué, la colonne principale prend toute la largeur
-        col_sidebar = None
-        col_main = st.container()
+        # Petite colonne juste pour le bouton d'ouverture si la sidebar est fermée
+        col_sidebar, col_main = st.columns([0.15, 6], gap="small")
 
-    # --- COLONNE LATÉRALE DE RECHERCHE ---
+    # --- COLONNE LATÉRALE (OU BOUTON D'OUVERTURE) ---
     siren_input = "123456789"
     btn_analyze = False
 
-    if col_sidebar:
-        with col_sidebar:
+    with col_sidebar:
+        if st.session_state.show_sidebar:
             st.markdown('<div class="custom-sidebar">', unsafe_allow_html=True)
-            st.header("Recherche Entreprise")
+
+            # En-tête de la sidebar avec bouton de fermeture (flèche gauche)
+            c_title, c_btn = st.columns([4, 1])
+            with c_title:
+                st.markdown("<h4 style='color: #ffffff; margin: 0; padding-top: 4px;'>Recherche</h4>", unsafe_allow_html=True)
+            with c_btn:
+                if st.button("◀", help="Masquer la recherche"):
+                    st.session_state.show_sidebar = False
+                    st.rerun()
+
+            st.divider()
+
             siren_input = st.text_input(
                 "Numéro SIREN (9 chiffres)",
                 value="123456789",
@@ -504,6 +505,11 @@ def main():
                 "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
             )
             st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            # Bouton minimaliste avec flèche droite pour réafficher la sidebar
+            if st.button("▶", help="Afficher la recherche"):
+                st.session_state.show_sidebar = True
+                st.rerun()
 
     # --- COLONNE PRINCIPALE (TABLEAU DE BORD) ---
     with col_main:
@@ -571,7 +577,7 @@ def main():
                 st.json(data)
         else:
             if not st.session_state.show_sidebar:
-                st.info("👈 Cliquez sur '▶ Afficher la recherche' en haut pour ouvrir le panneau de recherche.")
+                st.info("👈 Cliquez sur la flèche **▶** à gauche pour ouvrir le panneau de recherche.")
             else:
                 st.info("👈 Entrez un numéro SIREN dans le panneau à gauche pour afficher le tableau de bord.")
 
