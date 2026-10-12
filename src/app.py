@@ -67,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5.5rem !important;
+        padding-top: 5.2rem !important;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -75,7 +75,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. BARRE FIXE & MISE EN PAGE DES BOUTONS                               */
+    /* 2. CIBLAGE STRICT : BARRE DE RECHERCHE FIXE SUR UNE LIGNE              */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
         position: fixed !important;
@@ -87,11 +87,13 @@ st.markdown("""
         background-color: rgba(11, 13, 14, 0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        padding: 12px 2rem !important;
+        padding: 10px 2rem !important;
         box-sizing: border-box !important;
         border-bottom: 1px solid #232830 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
         margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
     }
 
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
@@ -120,15 +122,15 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Style général des boutons Streamlit */
+    /* Bouton recherche */
     .stButton > button {
         background-color: #16191d !important;
         color: #ffffff !important;
         font-weight: 600 !important;
         border-radius: 16px !important;
         border: 1.5px solid #232830 !important;
-        padding: 0.6rem 1rem !important;
-        height: 46px !important;
+        padding: 0.5rem 1rem !important;
+        height: 42px !important;
         transition: all 0.3s ease !important;
         box-sizing: border-box !important;
         width: 100% !important;
@@ -141,87 +143,17 @@ st.markdown("""
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
-    /* CIBLAGE RADICAL DU BOUTON X (2ème colonne) POUR QU'IL RESTE PETIT ET CARRÉ PARTOUT */
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
-        flex: 0 0 48px !important;
-        width: 48px !important;
-        max-width: 48px !important;
-    }
-
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) .stButton > button {
-        width: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
-        padding: 0 !important;
-        font-size: 1.1rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
     /* ---------------------------------------------------------------------- */
     /* 3. MEDIA QUERIES : OPTIMISATION MOBILE (< 768px)                       */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 768px) {
         .main .block-container {
-            padding-top: 7.2rem !important;
+            padding-top: 4.5rem !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
-
-        /* Organisation de la barre fixe en grille : Input sur la ligne 1, Croix (petite) + Recherche sur la ligne 2 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
-            display: grid !important;
-            grid-template-columns: 48px 1fr !important;
-            gap: 8px !important;
-            padding: 10px 1rem !important;
-        }
-
-        /* L'input SIREN occupe toute la largeur sur la ligne 1 */
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
-            grid-column: 1 / 3 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-
-        /* Le bouton Croix (colonne 2) se positionne à gauche de la ligne 2 avec une taille miniature fixe de 44px */
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
-            grid-column: 1 / 2 !important;
-            width: 48px !important;
-            max-width: 48px !important;
-        }
-
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) .stButton > button {
-            width: 44px !important;
-            min-width: 44px !important;
-            max-width: 44px !important;
-            height: 40px !important;
-        }
-
-        /* Le bouton Recherche (colonne 3) prend tout le reste de la ligne 2 */
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
-            grid-column: 2 / 3 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) .stButton > button {
-            height: 40px !important;
-            padding: 0.3rem 0.5rem !important;
-            font-size: 0.9rem !important;
-            border-radius: 12px !important;
-            width: 100% !important;
-        }
-
-        div[data-baseweb="input"] {
-            height: 40px !important;
-            min-height: 40px !important;
-            border-radius: 16px !important;
-            background-position: 12px center !important;
-        }
-
-        div[data-baseweb="input"] input {
-            font-size: 0.9rem !important;
+            padding: 8px 1rem !important;
         }
     }
 
@@ -254,10 +186,12 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. NAVIGATION PAR ANCRES                                               */
+    /* 4. NAVIGATION PAR ANCRES & BOUTON RETOUR                               */
     /* ---------------------------------------------------------------------- */
-    .nav-container {
+    .nav-wrapper {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
         gap: 0.6rem;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
@@ -267,12 +201,17 @@ st.markdown("""
         -webkit-overflow-scrolling: touch;
     }
 
-    .nav-container::-webkit-scrollbar {
+    .nav-wrapper::-webkit-scrollbar {
         height: 3px;
     }
-    .nav-container::-webkit-scrollbar-thumb {
+    .nav-wrapper::-webkit-scrollbar-thumb {
         background: #232830;
         border-radius: 4px;
+    }
+
+    .nav-container {
+        display: flex;
+        gap: 0.6rem;
     }
 
     .nav-btn {
@@ -298,7 +237,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 5. FICHE D'IDENTITÉ RESPONSIVE & SCORECARDS                            */
+    /* 5. FICHE D'IDENTITÉ & SCORECARDS                                       */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -541,8 +480,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE & BOUTONS (Ordre : Input, Croix, Recherche) ---
-    col_input, col_clear, col_btn = st.columns([6.8, 0.7, 2.5], gap="small")
+    # --- 1. BARRE DE RECHERCHE FIXE (UNIQUEMENT INPUT & RECHERCHE) ---
+    col_input, col_btn = st.columns([10, 1], gap="small")
 
     with col_input:
         siren_input = st.text_input(
@@ -552,15 +491,8 @@ def main():
             label_visibility="collapsed",
             placeholder="N° SIREN (9 chiffres)..."
         )
-    with col_clear:
-        btn_clear = st.button("✕", type="secondary", use_container_width=True, help="Effacer la recherche (Accueil)")
     with col_btn:
         btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
-
-    # Gestion du bouton Effacer
-    if btn_clear:
-        st.session_state["last_siren"] = ""
-        st.rerun()
 
     # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
@@ -575,22 +507,38 @@ def main():
         "et le dynamisme commercial de n'importe quelle entreprise."
     )
 
-    # Boutons de navigation ancrés & scrollables sur mobile
-    st.markdown("""
-    <div class="nav-container">
-        <a href="#section-identite" class="nav-btn">◈ Identité</a>
-        <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
-        <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.divider()
-
     # Gestion de l'état de recherche
     if btn_analyze:
         st.session_state["last_siren"] = siren_input.strip()
 
     target_siren = st.session_state.get("last_siren", siren_input.strip())
+
+    # --- 3. NAVIGATION PAR ANCRES & BOUTON RETOUR CONDITIONNEL ---
+    # Si une recherche est active, on affiche les boutons d'ancres + le bouton Retour à droite
+    if target_siren:
+        col_nav, col_back = st.columns([10, 1], gap="small")
+        with col_nav:
+            st.markdown("""
+            <div class="nav-container">
+                <a href="#section-identite" class="nav-btn">◈ Identité</a>
+                <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
+                <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
+            </div>
+            """, unsafe_allow_html=True)
+        with col_back:
+            if st.button("↩", type="secondary", use_container_width=True, help="Retour à l'accueil"):
+                st.session_state["last_siren"] = ""
+                st.rerun()
+    else:
+        st.markdown("""
+        <div class="nav-container">
+            <a href="#section-identite" class="nav-btn">◈ Identité</a>
+            <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
+            <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.divider()
 
     if target_siren:
         if len(target_siren) != 9 or not target_siren.isdigit():
