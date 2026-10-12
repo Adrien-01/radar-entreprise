@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & TYPOGRAPHIE FLUIDE                                 */
+    /* 1. STYLES GLOBAUX & ESPACEMENT HAUT                                    */
     /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
@@ -65,8 +65,9 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
+    /* Compenser l'espace en haut pour laisser la place à la barre fixe */
     .main .block-container {
-        padding-top: 1rem;
+        padding-top: 5.2rem !important;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -74,39 +75,37 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE FIXE (STICKY) AVEC LOUPE (STYLE DEEZER)             */
+    /* BARRE DE RECHERCHE FIXE EN HAUT (STYLE DEEZER)                         */
     /* ---------------------------------------------------------------------- */
-    .sticky-search-container {
-        position: sticky;
+    .fixed-search-wrapper {
+        position: fixed;
         top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(11, 13, 14, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         z-index: 99999;
-        background-color: rgba(11, 13, 14, 0.92);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding: 0.8rem 0 1rem 0;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid rgba(35, 40, 48, 0.6);
+        padding: 10px 24px;
+        box-sizing: border-box;
+        border-bottom: 1px solid #232830;
     }
 
-    /* Intégration de la loupe SVG dans le champ input */
+    /* Champ input avec loupe intégrée en arrière-plan */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
         border: 1px solid #232830 !important;
         border-radius: 20px !important;
-        padding-left: 8px !important;
-    }
-
-    div[data-baseweb="input"]::before {
-        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-        display: flex;
-        align-items: center;
-        margin-left: 6px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: 14px center !important;
     }
 
     div[data-baseweb="input"] input {
         color: #ffffff !important;
         background-color: transparent !important;
         font-weight: 600 !important;
+        padding-left: 38px !important;
     }
 
     div[data-baseweb="input"] input::placeholder {
@@ -475,8 +474,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- BARRE DE RECHERCHE FIXE (STICKY) TOUT EN HAUT AVEC LOUPE ---
-    st.markdown('<div class="sticky-search-container">', unsafe_allow_html=True)
+    # --- BARRE DE RECHERCHE FIXE EN HAUT (STYLE DEEZER) ---
+    st.markdown('<div class="fixed-search-wrapper">', unsafe_allow_html=True)
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -485,13 +484,13 @@ def main():
             value="123456789",
             max_chars=9,
             label_visibility="collapsed",
-            placeholder="Saisissez un numéro SIREN ou recherchez..."
+            placeholder="Artistes, titres, podcasts ou n° SIREN..."
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # En-tête : RadarEntreprise responsive (placé juste sous la barre fixe)
+    # En-tête : RadarEntreprise responsive
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
