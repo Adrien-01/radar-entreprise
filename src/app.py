@@ -74,21 +74,26 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE STICKY (COLLANTE AU DÉFILEMENT)                      */
+    /* BARRE DE RECHERCHE STICKY (Ciblage strict du tout premier bloc)        */
     /* ---------------------------------------------------------------------- */
-    .sticky-search-wrapper {
-        position: sticky;
-        top: 0;
-        z-index: 99999;
-        background-color: rgba(11, 13, 14, 0.95);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: 10px 0;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #232830;
+    .main .block-container > div:first-child [data-testid="stHorizontalBlock"],
+    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child [data-testid="stHorizontalBlock"] {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 99999 !important;
+        background-color: rgba(11, 13, 14, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        padding: 12px 10px !important;
+        margin-top: -1.5rem !important;
+        margin-left: -1.5rem !important;
+        margin-right: -1.5rem !important;
+        width: calc(100% + 3rem) !important;
+        box-sizing: border-box !important;
+        border-bottom: 1px solid #232830 !important;
     }
 
-    /* Champ input avec loupe intégrée façon Deezer */
+    /* Champ input avec loupe intégrée (style Deezer) */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
         border: 1px solid #232830 !important;
@@ -115,7 +120,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
-        margin-top: 0.5rem;
+        margin-top: 1.5rem;
     }
 
     .brand-title {
@@ -471,8 +476,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- BARRE DE RECHERCHE STICKY TOUT EN HAUT (STYLE DEEZER AVEC LOUPE) ---
-    st.markdown('<div class="sticky-search-wrapper">', unsafe_allow_html=True)
+    # --- 1. BARRE DE RECHERCHE FIXE (STICKY) EN TOUT PREMIER ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -485,9 +489,8 @@ def main():
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    # En-tête : RadarEntreprise responsive
+    # --- 2. EN-TÊTE DE LA PAGE (SOUS LA BARRE DE RECHERCHE) ---
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
