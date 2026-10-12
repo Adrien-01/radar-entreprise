@@ -75,9 +75,9 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE FIXE EN HAUT (Ciblage du bloc Streamlit)            */
+    /* BARRE DE RECHERCHE FIXE EN HAUT (Ciblage exclusif du formulaire stForm) */
     /* ---------------------------------------------------------------------- */
-    [data-testid="stHorizontalBlock"]:first-of-type {
+    [data-testid="stForm"] {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -86,9 +86,11 @@ st.markdown("""
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         z-index: 99999 !important;
-        padding: 12px 24px !important;
+        padding: 10px 24px !important;
         box-sizing: border-box !important;
+        border: none !important;
         border-bottom: 1px solid #232830 !important;
+        border-radius: 0 !important;
         margin: 0 !important;
     }
 
@@ -298,7 +300,7 @@ st.markdown("""
     }
 
     /* Custom Buttons */
-    .stButton > button {
+    .stButton > button, div.stFormSubmitButton > button {
         background-color: #a3e635 !important;
         color: #0b0d0e !important;
         font-weight: 700 !important;
@@ -306,9 +308,10 @@ st.markdown("""
         border: none !important;
         padding: 0.5rem 1rem !important;
         transition: all 0.2s ease !important;
+        width: 100% !important;
     }
 
-    .stButton > button:hover {
+    .stButton > button:hover, div.stFormSubmitButton > button:hover {
         background-color: #bef264 !important;
         box-shadow: 0 0 15px rgba(163, 230, 53, 0.4) !important;
     }
@@ -475,19 +478,20 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- BARRE DE RECHERCHE FIXE EN HAUT (PREMIER BLOC DE LA PAGE) ---
-    col_input, col_btn = st.columns([4, 1], gap="medium")
+    # --- BARRE DE RECHERCHE FIXE EN HAUT (FORMULAIRE ISOLÉ) ---
+    with st.form("search_form"):
+        col_input, col_btn = st.columns([4, 1], gap="medium")
 
-    with col_input:
-        siren_input = st.text_input(
-            "Numéro SIREN (9 chiffres)",
-            value="123456789",
-            max_chars=9,
-            label_visibility="collapsed",
-            placeholder="Saisissez un numéro SIREN (ex: 123456789)..."
-        )
-    with col_btn:
-        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+        with col_input:
+            siren_input = st.text_input(
+                "Numéro SIREN (9 chiffres)",
+                value=st.session_state.get("last_siren", "123456789"),
+                max_chars=9,
+                label_visibility="collapsed",
+                placeholder="Saisissez un numéro SIREN (ex: 123456789)..."
+            )
+        with col_btn:
+            btn_analyze = st.form_submit_button("Lancer l'analyse 🚀", use_container_width=True)
 
     # En-tête : RadarEntreprise responsive
     st.markdown(
