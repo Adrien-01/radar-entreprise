@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & ESPACEMENT HAUT                                    */
+    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS EN HAUT         */
     /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
@@ -66,7 +66,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 1.5rem;
+        padding-top: 0rem !important; /* Collé tout en haut */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -85,7 +85,6 @@ st.markdown("""
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         padding: 12px 10px !important;
-        margin-top: -1.5rem !important;
         margin-left: -1.5rem !important;
         margin-right: -1.5rem !important;
         width: calc(100% + 3rem) !important;
@@ -93,7 +92,7 @@ st.markdown("""
         border-bottom: 1px solid #232830 !important;
     }
 
-    /* Champ input avec loupe intégrée (style Deezer) */
+    /* Champ input avec loupe intégrée */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
         border: 1px solid #232830 !important;
@@ -120,7 +119,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
     }
 
     .brand-title {
