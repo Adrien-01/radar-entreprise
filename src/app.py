@@ -75,7 +75,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. BARRE FIXE & GRILLE DES BOUTONS                                     */
+    /* 2. BARRE FIXE & MISE EN PAGE DES BOUTONS                               */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
         position: fixed !important;
@@ -120,7 +120,7 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Style général des boutons */
+    /* Style général des boutons Streamlit */
     .stButton > button {
         background-color: #16191d !important;
         color: #ffffff !important;
@@ -141,10 +141,17 @@ st.markdown("""
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
     }
 
-    /* Ciblage spécifique pour forcer le bouton X à rester petit et carré */
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) button {
-        max-width: 50px !important;
-        min-width: 40px !important;
+    /* CIBLAGE RADICAL DU BOUTON X (2ème colonne) POUR QU'IL RESTE PETIT ET CARRÉ PARTOUT */
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
+        flex: 0 0 48px !important;
+        width: 48px !important;
+        max-width: 48px !important;
+    }
+
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) .stButton > button {
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
         padding: 0 !important;
         font-size: 1.1rem !important;
         display: flex !important;
@@ -162,44 +169,48 @@ st.markdown("""
             padding-right: 1rem !important;
         }
 
-        /* Organisation de la barre fixe en grille sur mobile : Input en haut, Croix + Recherche en bas sur une ligne */
+        /* Organisation de la barre fixe en grille : Input sur la ligne 1, Croix (petite) + Recherche sur la ligne 2 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
             display: grid !important;
-            grid-template-columns: 46px 1fr !important;
+            grid-template-columns: 48px 1fr !important;
             gap: 8px !important;
             padding: 10px 1rem !important;
         }
 
-        /* L'input SIREN prend toute la largeur sur la ligne 1 */
+        /* L'input SIREN occupe toute la largeur sur la ligne 1 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
             grid-column: 1 / 3 !important;
             width: 100% !important;
             max-width: 100% !important;
         }
 
-        /* Le bouton Croix (colonne 2) se met à gauche sur la ligne 2 avec une taille réduite fixe */
+        /* Le bouton Croix (colonne 2) se positionne à gauche de la ligne 2 avec une taille miniature fixe de 44px */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
             grid-column: 1 / 2 !important;
-            width: 46px !important;
+            width: 48px !important;
+            max-width: 48px !important;
         }
 
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) button {
-            width: 46px !important;
-            max-width: 46px !important;
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) .stButton > button {
+            width: 44px !important;
+            min-width: 44px !important;
+            max-width: 44px !important;
             height: 40px !important;
         }
 
-        /* Le bouton Recherche (colonne 3) prend tout le reste de la ligne 2 à droite */
+        /* Le bouton Recherche (colonne 3) prend tout le reste de la ligne 2 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
             grid-column: 2 / 3 !important;
             width: 100% !important;
+            max-width: 100% !important;
         }
 
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) button {
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) .stButton > button {
             height: 40px !important;
             padding: 0.3rem 0.5rem !important;
             font-size: 0.9rem !important;
             border-radius: 12px !important;
+            width: 100% !important;
         }
 
         div[data-baseweb="input"] {
@@ -531,7 +542,7 @@ def render_company_info(data: dict):
 
 def main():
     # --- 1. BARRE DE RECHERCHE & BOUTONS (Ordre : Input, Croix, Recherche) ---
-    col_input, col_clear, col_btn = st.columns([7, 1, 2], gap="small")
+    col_input, col_clear, col_btn = st.columns([6.8, 0.7, 2.5], gap="small")
 
     with col_input:
         siren_input = st.text_input(
