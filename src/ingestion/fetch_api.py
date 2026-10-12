@@ -5,56 +5,44 @@ from typing import Dict, Any
 def fetch_sirene_data(siren: str) -> Dict[str, Any]:
     """
     Interroge l'API Recherche Entreprises (Insee / Etalab) pour récupérer les données administratives réelles.
+    Lève une exception si l'entreprise n'est pas trouvée.
     """
     url = f"https://recherche-entreprises.api.gouv.fr/search?q={siren}"
-    try:
-        response = requests.get(url, timeout=5)
-        if response.status_code == 200:
-            results = response.json().get("results", [])
-            if results:
-                company = results[0]
-                siege = company.get("siege", {})
+    response = requests.get(url, timeout=5)
 
-                # Formatage de l'adresse du siège
-                adresse_parts = [
-                    siege.get("numero_voie"),
-                    siege.get("indice_repetition"),
-                    siege.get("type_voie"),
-                    siege.get("libelle_voie"),
-                    siege.get("code_postal"),
-                    siege.get("libelle_commune")
-                ]
-                adresse_siege = " ".join([str(p) for p in adresse_parts if p]) or "N/A"
+    if response.status_code != 200:
+        raise ConnectionError(f"Erreur HTTP lors de l'accès à l'API Sirene (Code : {response.status_code})")
 
-                return {
-                    "siren": company.get("siren", siren),
-                    "raison_sociale": company.get("nom_complet", "ENTREPRISE INCONNUE"),
-                    "statut_administratif": "Actif" if company.get("etat_administratif") == "A" else "Inactif",
-                    "date_creation": company.get("date_creation", "N/A"),
-                    "tranche_effectifs": company.get("tranche_effectifs_salarie", "Non renseigné"),
-                    "code_naf": company.get("activite_principale", "N/A"),
-                    "libelle_naf": company.get("libelle_activite_principale", ""),
-                    "departement": siege.get("departement", "44"),
-                    "adresse_siege": adresse_siege,
-                    "dirigeants": ",. ".join([f"{d.get('prenoms', '')} {d.get('nom', '')}" for d in company.get("dirigeants", [])]) or "Aucun dirigeant répertorié",
-                    "nb_mouvements_gov": len(company.get("dirigeants", []))
-                }
-    except Exception as e:
-        print(f"[API Sirene Error] {e}")
+    results = response.json().get("results", [])
+    if not results:
+        raise ValueError(f"Aucune entreprise enregistrée pour le SIREN : {siren}")
 
-    # Fallback par défaut si l'API échoue
+    company = results[0]
+    siege = company.get("siege", {})
+
+    # Formatage de l'adresse du siège
+    adresse_parts = [
+        siege.get("numero_voie"),
+        siege.get("indice_repetition"),
+        siege.get("type_voie"),
+        siege.get("libelle_voie"),
+        siege.get("code_postal"),
+        siege.get("libelle_commune")
+    ]
+    adresse_siege = " ".join([str(p) for p in adresse_parts if p]) or "N/A"
+
     return {
-        "siren": siren,
-        "raison_sociale": "ENTREPRISE DEMO",
-        "statut_administratif": "Actif",
-        "date_creation": "N/A",
-        "tranche_effectifs": "N/A",
-        "code_naf": "6201Z",
-        "libelle_naf": "Programmation informatique",
-        "departement": "44",
-        "adresse_siege": "N/A",
-        "dirigeants": "N/A",
-        "nb_mouvements_gov": 1
+        "siren": company.get("siren", siren),
+        "raison_sociale": company.get("nom_complet", "ENTREPRISE INCONNUE"),
+        "statut_administratif": "Actif" if company.get("etat_administratif") == "A" else "Inactif",
+        "date_creation": company.get("date_creation", "N/A"),
+        "tranche_effectifs": company.get("tranche_effectifs_salarie", "Non renseigné"),
+        "code_naf": company.get("activite_principale", "N/A"),
+        "libelle_naf": company.get("libelle_activite_principale", "N/A"),
+        "departement": siege.get("departement", "44"),
+        "adresse_siege": adresse_siege,
+        "dirigeants": ",. ".join([f"{d.get('prenoms', '')} {d.get('nom', '')}" for d in company.get("dirigeants", [])]) or "Aucun dirigeant répertorié",
+        "nb_mouvements_gov": len(company.get("dirigeants", []))
     }
 
 
@@ -95,7 +83,7 @@ def fetch_boamp_data(siren: str) -> Dict[str, Any]:
     except Exception as e:
         print(f"[API BOAMP Error] {e}")
 
-    profil = "Acteur public" if nb_marches > 0 else "Exclusivement privé"
+    profil = "Dépendance publique forte" if nb_marches > 0 else "Exclusivement privé"
 
     return {
         "siren": siren,
@@ -108,7 +96,7 @@ def ingest_siren_data_to_duckdb(siren: str, conn: duckdb.DuckDBPyConnection):
     """
     Ingère l'ensemble des réponses API brutes dans les tables Staging DuckDB.
     """
-    sirene_data = fetch_sirene_data(siren)
+    sirene_data = fetch_sirene_data(siren)  # Lèvera une erreur si le SIREN n'existe pas
     bodacc_data = fetch_bodacc_data(siren)
     boamp_data = fetch_boamp_data(siren)
 
