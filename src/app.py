@@ -24,10 +24,6 @@ except ModuleNotFoundError:
     from ingestion.fetch_api import ingest_siren_data_to_duckdb
     from components.kpi_cards import render_kpi_cards
 
-# Gestion de l'état d'affichage de la colonne latérale
-if "show_sidebar" not in st.session_state:
-    st.session_state.show_sidebar = True
-
 # ==============================================================================
 # CONFIGURATION STREAMLIT & STYLES CSS RESPONSIVE
 # ==============================================================================
@@ -41,7 +37,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* ---------------------------------------------------------------------- */
-    /* 0. MASQUAGE TOTAL DE LA SIDEBAR NATIVE & DU HEADER STREAMLIT           */
+    /* 0. MASQUAGE TOTAL DE LA SIDEBAR & DU HEADER STREAMLIT                  */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHeader"] {
         display: none !important;
@@ -70,23 +66,25 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 1.2rem;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-        max-width: 1400px;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        max-width: 1200px;
     }
 
-    /* Panneau latéral personnalisé plus fin et épuré */
-    .custom-sidebar {
+    /* Bloc de recherche horizontal */
+    .search-container {
         background-color: #121518;
         border: 1px solid #1f242d;
         border-radius: 14px;
-        padding: 1rem;
+        padding: 1.2rem;
+        margin-top: 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
     /* ---------------------------------------------------------------------- */
-    /* STYLISATION DU CHAMP DE RECHERCHE SIREN (Fond Sombre + Texte Blanc)   */
+    /* STYLISATION DU CHAMP DE RECHERCHE SIREN                               */
     /* ---------------------------------------------------------------------- */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
@@ -104,7 +102,7 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Header & Branding responsive (clamp) */
+    /* Header & Branding responsive */
     .header-container {
         display: flex;
         align-items: baseline;
@@ -132,7 +130,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile)                      */
+    /* 2. NAVIGATION PAR ANCRES                                              */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -176,7 +174,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 3. FICHE D'IDENTITÉ RESPONSIVE (.dark-card)                            */
+    /* 3. FICHE D'IDENTITÉ RESPONSIVE                                        */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -235,7 +233,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. SCORECARDS XXL (HAUTEUR ET ALIGNEMENT UNIFORMES)                    */
+    /* 4. SCORECARDS XXL                                                     */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
         background: #18181B !important;
@@ -465,121 +463,87 @@ def render_company_info(data: dict):
 
 
 def main():
-    # Définition des largeurs de colonnes : Si la sidebar est fermée, on ajuste
-    if st.session_state.show_sidebar:
-        col_sidebar, col_main = st.columns([1, 4], gap="medium")
-    else:
-        # Petite colonne juste pour le bouton d'ouverture si la sidebar est fermée
-        col_sidebar, col_main = st.columns([0.15, 6], gap="small")
+    # En-tête : RadarEntreprise responsive
+    st.markdown(
+        '<div class="header-container">'
+        '<span class="brand-title">RadarEntreprise</span>'
+        '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
+        "et le dynamisme commercial de n'importe quelle entreprise."
+    )
 
-    # --- COLONNE LATÉRALE (OU BOUTON D'OUVERTURE) ---
-    siren_input = "123456789"
-    btn_analyze = False
+    # --- BARRE DE RECHERCHE INTÉGRÉE EN HAUT (SANS COLONNE LATÉRALE) ---
+    st.markdown('<div class="search-container">', unsafe_allow_html=True)
+    col_input, col_btn = st.columns([4, 1], gap="medium")
 
-    with col_sidebar:
-        if st.session_state.show_sidebar:
-            st.markdown('<div class="custom-sidebar">', unsafe_allow_html=True)
-
-            # En-tête de la sidebar avec bouton de fermeture (flèche gauche)
-            c_title, c_btn = st.columns([4, 1])
-            with c_title:
-                st.markdown("<h4 style='color: #ffffff; margin: 0; padding-top: 4px;'>Recherche</h4>", unsafe_allow_html=True)
-            with c_btn:
-                if st.button("◀", help="Masquer la recherche"):
-                    st.session_state.show_sidebar = False
-                    st.rerun()
-
-            st.divider()
-
-            siren_input = st.text_input(
-                "Numéro SIREN (9 chiffres)",
-                value="123456789",
-                max_chars=9,
-                help="Saisissez un numéro SIREN pour analyser l'entreprise."
-            )
-            btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
-
-            st.divider()
-            st.info(
-                "**RadarEntreprise** ingère en temps réel les données des API publiques "
-                "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
-            )
-            st.markdown('</div>', unsafe_allow_html=True)
-        else:
-            # Bouton minimaliste avec flèche droite pour réafficher la sidebar
-            if st.button("▶", help="Afficher la recherche"):
-                st.session_state.show_sidebar = True
-                st.rerun()
-
-    # --- COLONNE PRINCIPALE (TABLEAU DE BORD) ---
-    with col_main:
-        # En-tête : RadarEntreprise responsive
-        st.markdown(
-            '<div class="header-container">'
-            '<span class="brand-title">RadarEntreprise</span>'
-            '<span class="white-subtitle">• L\'analyse d\'entreprise en un clic</span>'
-            '</div>',
-            unsafe_allow_html=True,
+    with col_input:
+        siren_input = st.text_input(
+            "Numéro SIREN (9 chiffres)",
+            value="123456789",
+            max_chars=9,
+            label_visibility="collapsed",
+            placeholder="Saisissez un numéro SIREN (ex: 123456789)..."
         )
-        st.caption(
-            "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
-            "et le dynamisme commercial de n'importe quelle entreprise."
-        )
+    with col_btn:
+        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
 
-        # Boutons de navigation ancrés & scrollables sur mobile
-        st.markdown("""
-        <div class="nav-container">
-            <a href="#section-identite" class="nav-btn">◈ Identité</a>
-            <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
-            <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Boutons de navigation ancrés & scrollables sur mobile
+    st.markdown("""
+    <div class="nav-container">
+        <a href="#section-identite" class="nav-btn">◈ Identité</a>
+        <a href="#section-indicateurs" class="nav-btn">⌬ Indicateurs clés</a>
+        <a href="#section-brutes" class="nav-btn">↳ Données brutes</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.divider()
+
+    # Exécution de la recherche
+    if btn_analyze or "last_siren" in st.session_state:
+        target_siren = siren_input.strip()
+
+        if len(target_siren) != 9 or not target_siren.isdigit():
+            st.error("⚠️ Veuillez entrer un numéro SIREN valide de 9 chiffres.")
+            return
+
+        st.session_state["last_siren"] = target_siren
+
+        # 1. Ingestion API & Pipeline dbt
+        with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
+            conn = duckdb.connect(str(DB_PATH))
+            ingest_siren_data_to_duckdb(target_siren, conn)
+            conn.close()
+
+            if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
+                run_dbt_pipeline(target_siren)
+
+        # 2. Lecture des données & Rendu UI
+        data = fetch_company_data_from_duckdb(target_siren)
+
+        # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
+        st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
+        render_company_info(data)
 
         st.divider()
 
-        # Exécution de la recherche
-        if btn_analyze or "last_siren" in st.session_state:
-            target_siren = siren_input.strip()
+        # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
+        st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
+        render_kpi_cards(data)
 
-            if len(target_siren) != 9 or not target_siren.isdigit():
-                st.error("⚠️ Veuillez entrer un numéro SIREN valide de 9 chiffres.")
-                return
+        st.divider()
 
-            st.session_state["last_siren"] = target_siren
-
-            # 1. Ingestion API & Pipeline dbt
-            with st.spinner("1/2 — Ingestion API & Traitement DuckDB..."):
-                conn = duckdb.connect(str(DB_PATH))
-                ingest_siren_data_to_duckdb(target_siren, conn)
-                conn.close()
-
-                if DBT_PROJECT_DIR.exists() and (DBT_PROJECT_DIR / "dbt_project.yml").exists():
-                    run_dbt_pipeline(target_siren)
-
-            # 2. Lecture des données & Rendu UI
-            data = fetch_company_data_from_duckdb(target_siren)
-
-            # SECTION 1 : FICHE IDENTITÉ D'ENTREPRISE
-            st.markdown('<div id="section-identite"></div>', unsafe_allow_html=True)
-            render_company_info(data)
-
-            st.divider()
-
-            # SECTION 2 : SCORECARDS / KPIS (Grid 2x2 XXL)
-            st.markdown('<div id="section-indicateurs"></div>', unsafe_allow_html=True)
-            render_kpi_cards(data)
-
-            st.divider()
-
-            # SECTION 3 : DETAILS DES METRIQUES BRUTES
-            st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
-            with st.expander("↳ Détails des métriques brutes (DuckDB)"):
-                st.json(data)
-        else:
-            if not st.session_state.show_sidebar:
-                st.info("👈 Cliquez sur la flèche **▶** à gauche pour ouvrir le panneau de recherche.")
-            else:
-                st.info("👈 Entrez un numéro SIREN dans le panneau à gauche pour afficher le tableau de bord.")
+        # SECTION 3 : DETAILS DES METRIQUES BRUTES
+        st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
+        with st.expander("↳ Détails des métriques brutes (DuckDB)"):
+            st.json(data)
+    else:
+        st.info("👆 Entrez un numéro SIREN ci-dessus et cliquez sur **Lancer l'analyse** pour afficher le tableau de bord.")
 
 
 if __name__ == "__main__":
