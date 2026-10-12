@@ -66,7 +66,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 1.5rem;
+        padding-top: 1rem;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -74,12 +74,33 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* STYLISATION DU CHAMP DE RECHERCHE SIREN                               */
+    /* BARRE DE RECHERCHE FIXE (STICKY) AVEC LOUPE (STYLE DEEZER)             */
     /* ---------------------------------------------------------------------- */
+    .sticky-search-container {
+        position: sticky;
+        top: 0;
+        z-index: 99999;
+        background-color: rgba(11, 13, 14, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 0.8rem 0 1rem 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(35, 40, 48, 0.6);
+    }
+
+    /* Intégration de la loupe SVG dans le champ input */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
         border: 1px solid #232830 !important;
-        border-radius: 10px !important;
+        border-radius: 20px !important;
+        padding-left: 8px !important;
+    }
+
+    div[data-baseweb="input"]::before {
+        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+        display: flex;
+        align-items: center;
+        margin-left: 6px;
     }
 
     div[data-baseweb="input"] input {
@@ -98,6 +119,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
+        margin-top: 0.5rem;
     }
 
     .brand-title {
@@ -120,7 +142,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. NAVIGATION PAR ANCRES                                              */
+    /* 2. NAVIGATION PAR ANCRES                                               */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -164,7 +186,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 3. FICHE D'IDENTITÉ RESPONSIVE                                        */
+    /* 3. FICHE D'IDENTITÉ RESPONSIVE                                         */
     /* ---------------------------------------------------------------------- */
     .dark-card {
         background-color: #16191d;
@@ -223,7 +245,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 4. SCORECARDS XXL                                                     */
+    /* 4. SCORECARDS XXL                                                      */
     /* ---------------------------------------------------------------------- */
     .kpi-card-large {
         background: #18181B !important;
@@ -453,7 +475,23 @@ def render_company_info(data: dict):
 
 
 def main():
-    # En-tête : RadarEntreprise responsive
+    # --- BARRE DE RECHERCHE FIXE (STICKY) TOUT EN HAUT AVEC LOUPE ---
+    st.markdown('<div class="sticky-search-container">', unsafe_allow_html=True)
+    col_input, col_btn = st.columns([4, 1], gap="medium")
+
+    with col_input:
+        siren_input = st.text_input(
+            "Numéro SIREN (9 chiffres)",
+            value="123456789",
+            max_chars=9,
+            label_visibility="collapsed",
+            placeholder="Saisissez un numéro SIREN ou recherchez..."
+        )
+    with col_btn:
+        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # En-tête : RadarEntreprise responsive (placé juste sous la barre fixe)
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
@@ -465,20 +503,6 @@ def main():
         "Évaluez en un coup d'œil la santé financière, la stabilité de la gouvernance "
         "et le dynamisme commercial de n'importe quelle entreprise."
     )
-
-    # --- BARRE DE RECHERCHE DIRECTE SOUS LE TITRE ---
-    col_input, col_btn = st.columns([4, 1], gap="medium")
-
-    with col_input:
-        siren_input = st.text_input(
-            "Numéro SIREN (9 chiffres)",
-            value="123456789",
-            max_chars=9,
-            label_visibility="collapsed",
-            placeholder="Saisissez un numéro SIREN (ex: 123456789)..."
-        )
-    with col_btn:
-        btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
 
     # Boutons de navigation ancrés & scrollables sur mobile
     st.markdown("""
