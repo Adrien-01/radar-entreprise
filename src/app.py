@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS                  */
+    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS EN HAUT         */
     /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
@@ -66,7 +66,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5rem !important; /* Espace réservé pour la barre fixe en haut */
+        padding-top: 0rem !important; /* Collé tout en haut */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -74,23 +74,33 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE FIXE EN TOUT PREMIER (EXCLUSIVITÉ DU BLOC)         */
+    /* BARRE DE RECHERCHE FIXE ABSOLUE (BLOC DÉDIÉ)                           */
     /* ---------------------------------------------------------------------- */
-    .main .block-container > div:first-child,
-    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child {
+    div#sticky-search-container {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
+        width: 100vw !important;
         z-index: 999999 !important;
         background-color: rgba(11, 13, 14, 0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        padding: 12px 24px !important;
-        box-sizing: border-box !important;
         border-bottom: 1px solid #232830 !important;
+        padding: 12px 2rem !important;
+        box-sizing: border-box !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* Ajustement de la grille Streamlit à l'intérieur de la barre fixe */
+    div#sticky-search-container [data-testid="stHorizontalBlock"] {
+        max-width: 1200px;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    /* Espace de compensation pour que le contenu ne passe pas sous la barre fixe */
+    .content-wrapper {
+        margin-top: 85px;
     }
 
     /* Champ input avec loupe intégrée */
@@ -120,7 +130,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
-        margin-top: 0.5rem;
+        margin-top: 1rem;
     }
 
     .brand-title {
@@ -476,7 +486,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE FIXE EN TOUT PREMIER ---
+    # --- 1. BARRE DE RECHERCHE FIXE DÉDIÉE ---
+    st.markdown('<div id="sticky-search-container">', unsafe_allow_html=True)
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -489,6 +500,10 @@ def main():
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Conteneur de compensation pour éviter le chevauchement sous la barre fixe
+    st.markdown('<div class="content-wrapper"></div>', unsafe_allow_html=True)
 
     # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
