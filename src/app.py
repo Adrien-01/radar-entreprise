@@ -100,8 +100,9 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Alignement vertical de la colonne du bouton dans la barre fixe */
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
+    /* Alignement vertical des boutons dans la barre fixe */
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2),
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
         display: flex;
         align-items: flex-end;
     }
@@ -127,7 +128,7 @@ st.markdown("""
         color: #64748b !important;
     }
 
-    /* Bouton recherche harmonisé avec le style .dark-card */
+    /* Boutons harmonisés avec le style .dark-card */
     .stButton > button {
         background-color: #16191d !important;
         color: #ffffff !important;
@@ -464,19 +465,26 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE ---
-    col_input, col_btn = st.columns([10, 1], gap="small")
+    # --- 1. BARRE DE RECHERCHE & BOUTONS ---
+    col_input, col_btn, col_clear = st.columns([8, 1, 1], gap="small")
 
     with col_input:
         siren_input = st.text_input(
             "Numéro SIREN (9 chiffres)",
-            value=st.session_state.get("last_siren", "123456789"),
+            value=st.session_state.get("last_siren", ""),
             max_chars=9,
             label_visibility="collapsed",
             placeholder="N° SIREN (9 chiffres)..."
         )
     with col_btn:
         btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
+    with col_clear:
+        btn_clear = st.button("✕", type="secondary", use_container_width=True, help="Effacer la recherche (Accueil)")
+
+    # Gestion du bouton Effacer
+    if btn_clear:
+        st.session_state["last_siren"] = ""
+        st.rerun()
 
     # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
