@@ -67,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5.5rem !important; /* Laisse de l'espace pour que le contenu ne passe pas sous la barre fixe */
+        padding-top: 5.5rem !important; /* Laisse l'espace sous la barre fixe */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -75,9 +75,9 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. FIXATION ABSOLUE DE LA BARRE DE RECHERCHE (PREMIER BLOC HORIZONTAL) */
+    /* 2. CIBLAGE STRICT : UNIQUEMENT LE BLOC CONTENANT LA RECHERCHE SIREN   */
     /* ---------------------------------------------------------------------- */
-    [data-testid="stHorizontalBlock"]:first-of-type {
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -92,6 +92,12 @@ st.markdown("""
         border-bottom: 1px solid #232830 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
         margin: 0 !important;
+    }
+
+    /* Centrage du contenu à l'intérieur de la barre fixe */
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     /* Champ input avec loupe intégrée */
@@ -446,7 +452,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE (Ciblée précisément par le CSS comme premier bloc horizontal) ---
+    # --- 1. BARRE DE RECHERCHE (Ciblée rigoureusement par le CSS via son placeholder unique) ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
