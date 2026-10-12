@@ -245,19 +245,26 @@ def run_dbt_pipeline(siren: str) -> bool:
 def fetch_company_data_from_duckdb(siren: str) -> dict:
     conn = duckdb.connect(str(DB_PATH))
     try:
-        df = conn.sql("""
-            SELECT
-                siren, raison_sociale, code_naf, libelle_naf, tranche_effectifs,
-                statut_administratif, adresse_siege, dirigeants, date_creation,
-                flag_bodacc, nb_mouvements_gov, ratio_creation_fermeture,
-                qualification_tension, nb_marches_boamp, profil_commande_publique
-            FROM mart_enterprise_kpis
-            WHERE siren = ?
-        """, params=[siren]).df()
+        # Vérification sécurisée de l'existence de la table mart_enterprise_kpis
+        table_exists = conn.sql(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'mart_enterprise_kpis'"
+        ).fetchone()[0] > 0
 
-        if not df.empty:
-            return df.to_dict(orient="records")[0]
+        if table_exists:
+            df = conn.sql("""
+                SELECT
+                    siren, raison_sociale, code_naf, libelle_naf, tranche_effectifs,
+                    statut_administratif, adresse_siege, dirigeants, date_creation,
+                    flag_bodacc, nb_mouvements_gov, ratio_creation_fermeture,
+                    qualification_tension, nb_marches_boamp, profil_commande_publique
+                FROM mart_enterprise_kpis
+                WHERE siren = ?
+            """, params=[siren]).df()
 
+            if not df.empty:
+                return df.to_dict(orient="records")[0]
+
+        # Fallback sur les tables brutes si la table mart n'est pas encore créée
         df_raw = conn.sql("""
             SELECT
                 siren, raison_sociale, code_naf, libelle_naf, tranche_effectifs,
@@ -290,6 +297,8 @@ def fetch_company_data_from_duckdb(siren: str) -> dict:
                 "profil_commande_publique": profil_cp
             })
             return res
+    except Exception as e:
+        print(f"[DuckDB Error] {e}")
     finally:
         conn.close()
 
