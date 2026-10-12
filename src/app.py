@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. SUPPRESSION TOTALE DES ESPACES HAUTS                                */
+    /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE                      */
     /* ---------------------------------------------------------------------- */
     html, body {
         scroll-behavior: smooth;
@@ -67,7 +67,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 5rem !important; /* Compense la hauteur de la barre fixe */
+        padding-top: 5.5rem !important; /* Laisse de l'espace pour que le contenu ne passe pas sous la barre fixe */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -75,31 +75,23 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. CIBLAGE DU TOUT PREMIER BLOC (LA BARRE DE RECHERCHE) POUR LA FIXER  */
+    /* 2. FIXATION ABSOLUE DE LA BARRE DE RECHERCHE (PREMIER BLOC HORIZONTAL) */
     /* ---------------------------------------------------------------------- */
-    .main .block-container > div:first-child,
-    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child {
+    [data-testid="stHorizontalBlock"]:first-of-type {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
         z-index: 999999 !important;
-        background-color: #0b0d0e !important;
+        background-color: rgba(11, 13, 14, 0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        padding: 10px 2rem !important;
+        padding: 12px 2rem !important;
         box-sizing: border-box !important;
         border-bottom: 1px solid #232830 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
         margin: 0 !important;
-    }
-
-    /* Centrage du contenu de la barre fixe à 1200px max */
-    .main .block-container > div:first-child [data-testid="stHorizontalBlock"],
-    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child [data-testid="stHorizontalBlock"] {
-        max-width: 1200px;
-        margin: 0 auto;
-        width: 100%;
     }
 
     /* Champ input avec loupe intégrée */
@@ -454,7 +446,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE (Placée en tout premier, elle devient automatiquement fixe via le CSS) ---
+    # --- 1. BARRE DE RECHERCHE (Ciblée précisément par le CSS comme premier bloc horizontal) ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -468,7 +460,7 @@ def main():
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
 
-    # --- 2. EN-TÊTE DE LA PAGE (Défilant sous la barre de recherche) ---
+    # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
