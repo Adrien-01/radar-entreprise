@@ -100,7 +100,7 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Alignement vertical des boutons dans la barre fixe */
+    /* Alignement vertical des boutons dans la barre fixe (PC) */
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2),
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
         display: flex;
@@ -150,60 +150,58 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 5. MEDIA QUERIES : FORCER LA LIGNE UNIQUE SUR SMARTPHONE (< 768px)    */
+    /* 5. MEDIA QUERIES : ADAPTATION SMARTPHONE (< 768px)                     */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 768px) {
         .main .block-container {
-            padding-top: 4.2rem !important;
+            padding-top: 7rem !important; /* Espace suffisant pour la barre fixe sur 2 lignes */
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
 
+        /* La barre fixe passe en mode multiligne avec flex-wrap */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
             display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            padding: 8px 1rem !important;
-            gap: 6px !important;
+            flex-wrap: wrap !important;
+            padding: 10px 1rem !important;
+            gap: 8px !important;
         }
 
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
-            flex: 1 1 auto !important;
-            min-width: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Distribution des largeurs en mode smartphone : Input (62%), Recherche (26%), Croix (12%) */
+        /* Ligne 1 : L'input SIREN prend toute la largeur (100%) */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
-            flex: 6.2 !important;
-        }
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
-            flex: 2.6 !important;
-        }
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
-            flex: 1.2 !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
         }
 
-        /* Réduction de la hauteur et de la taille pour mobile */
+        /* Ligne 2 : Le bouton Recherche prend la majorité de l'espace à gauche */
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
+            flex: 1 1 auto !important;
+            max-width: calc(82% - 4px) !important;
+        }
+
+        /* Ligne 2 : Le bouton Croix se positionne à côté sur la même ligne */
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
+            flex: 0 0 18% !important;
+            max-width: 18% !important;
+        }
+
+        /* Réduction de la hauteur des boutons sur mobile */
         .stButton > button {
-            height: 38px !important;
-            padding: 0.2rem 0.2rem !important;
-            font-size: 0.75rem !important;
+            height: 40px !important;
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.9rem !important;
             border-radius: 12px !important;
         }
 
         div[data-baseweb="input"] {
-            height: 38px !important;
-            min-height: 38px !important;
+            height: 40px !important;
+            min-height: 40px !important;
             border-radius: 16px !important;
-            background-position: 10px center !important;
+            background-position: 12px center !important;
         }
 
         div[data-baseweb="input"] input {
-            padding-left: 34px !important;
-            font-size: 0.85rem !important;
+            font-size: 0.9rem !important;
         }
     }
 
