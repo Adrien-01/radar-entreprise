@@ -73,16 +73,6 @@ st.markdown("""
         max-width: 1200px;
     }
 
-    /* Bloc de recherche horizontal */
-    .search-container {
-        background-color: #121518;
-        border: 1px solid #1f242d;
-        border-radius: 14px;
-        padding: 1.2rem;
-        margin-top: 1.2rem;
-        margin-bottom: 1.5rem;
-    }
-
     /* ---------------------------------------------------------------------- */
     /* STYLISATION DU CHAMP DE RECHERCHE SIREN                               */
     /* ---------------------------------------------------------------------- */
@@ -476,8 +466,7 @@ def main():
         "et le dynamisme commercial de n'importe quelle entreprise."
     )
 
-    # --- BARRE DE RECHERCHE INTÉGRÉE EN HAUT (SANS COLONNE LATÉRALE) ---
-    st.markdown('<div class="search-container">', unsafe_allow_html=True)
+    # --- BARRE DE RECHERCHE DIRECTE SOUS LE TITRE ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -490,8 +479,6 @@ def main():
         )
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
 
     # Boutons de navigation ancrés & scrollables sur mobile
     st.markdown("""
@@ -542,6 +529,14 @@ def main():
         st.markdown('<div id="section-brutes"></div>', unsafe_allow_html=True)
         with st.expander("↳ Détails des métriques brutes (DuckDB)"):
             st.json(data)
+
+        st.divider()
+
+        # Message d'information sur la provenance des sources affiché après l'analyse
+        st.info(
+            "**RadarEntreprise** ingère en temps réel les données des API publiques "
+            "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
+        )
     else:
         st.info("👆 Entrez un numéro SIREN ci-dessus et cliquez sur **Lancer l'analyse** pour afficher le tableau de bord.")
 
