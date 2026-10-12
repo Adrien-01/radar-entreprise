@@ -159,28 +159,28 @@ st.markdown("""
             padding-right: 1rem !important;
         }
 
-        /* Grille mobile à 2 colonnes : Input en haut (sur les 2 colonnes), boutons en bas */
+        /* Grille mobile à 2 colonnes : Input en haut, Croix (plus petite) et Recherche en bas */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
             display: grid !important;
-            grid-template-columns: 1fr 54px !important;
+            grid-template-columns: 50px 1fr !important;
             gap: 8px !important;
             padding: 10px 1rem !important;
         }
 
-        /* L'input SIREN (colonne 1) s'étale sur toute la largeur */
+        /* L'input SIREN s'étale sur toute la largeur de la première ligne */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
             grid-column: 1 / 3 !important;
             width: 100% !important;
             max-width: 100% !important;
         }
 
-        /* Le bouton Recherche (colonne 2) se place sur la ligne 2 à gauche */
+        /* Le bouton Croix (colonne 2 dans le code, placée en premier sur la ligne 2) */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
             grid-column: 1 / 2 !important;
             width: 100% !important;
         }
 
-        /* Le bouton Croix (colonne 3) se place sur la ligne 2 à droite de Recherche */
+        /* Le bouton Recherche (colonne 3 dans le code, placée à droite de la croix) */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
             grid-column: 2 / 3 !important;
             width: 100% !important;
@@ -522,8 +522,8 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE & BOUTONS ---
-    col_input, col_btn, col_clear = st.columns([6.5, 2, 1], gap="small")
+    # --- 1. BARRE DE RECHERCHE & BOUTONS (Ordre : Input, Croix, Recherche) ---
+    col_input, col_clear, col_btn = st.columns([6.5, 1, 2], gap="small")
 
     with col_input:
         siren_input = st.text_input(
@@ -533,10 +533,10 @@ def main():
             label_visibility="collapsed",
             placeholder="N° SIREN (9 chiffres)..."
         )
-    with col_btn:
-        btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
     with col_clear:
         btn_clear = st.button("✕", type="secondary", use_container_width=True, help="Effacer la recherche (Accueil)")
+    with col_btn:
+        btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
 
     # Gestion du bouton Effacer
     if btn_clear:
