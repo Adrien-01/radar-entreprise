@@ -28,7 +28,7 @@ except ModuleNotFoundError:
 # CONFIGURATION STREAMLIT & STYLES CSS RESPONSIVE
 # ==============================================================================
 st.set_page_config(
-    page_title="RadarEntreprise — B2B Intelligence",
+    page_title="RadarEntreprise",
     page_icon="📡",
     layout="wide",
     initial_sidebar_state="auto"
@@ -37,11 +37,36 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* ---------------------------------------------------------------------- */
-    /* 0. MASQUAGE DE LA BARRE SUPÉRIEURE & DU FOOTER STREAMLIT               */
+    /* 0. GESTION DU HEADER & DU BOUTON DE LA SIDEBAR (CORRECTIF)             */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHeader"] {
+        background: transparent !important;
+        visibility: visible !important;
+    }
+
+    /* Masquer les éléments superflus du header de Streamlit */
+    [data-testid="stHeader"] > div:not(:has([data-testid="collapsedControl"])) {
         display: none !important;
     }
+
+    /* Style et visibilité du bouton pour ouvrir/fermer la sidebar */
+    [data-testid="collapsedControl"] {
+        display: flex !important;
+        visibility: visible !important;
+        background-color: #16191d !important;
+        border: 1px solid #2f3642 !important;
+        border-radius: 8px !important;
+        color: #a3e635 !important;
+        z-index: 999999;
+        margin: 0.5rem;
+    }
+
+    [data-testid="collapsedControl"]:hover {
+        border-color: #a3e635 !important;
+        background-color: #22272e !important;
+        color: #a3e635 !important;
+    }
+
     #MainMenu {
         visibility: hidden;
     }
@@ -134,7 +159,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile)                       */
+    /* 2. NAVIGATION PAR ANCRES (Scrollable sur mobile)                      */
     /* ---------------------------------------------------------------------- */
     .nav-container {
         display: flex;
@@ -244,7 +269,7 @@ st.markdown("""
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
         padding: 1.5rem !important;
-        min-height: 185px !important; /* Force la même hauteur pour toutes les cartes */
+        min-height: 185px !important;
         height: 100% !important;
         display: flex !important;
         flex-direction: column !important;
@@ -535,7 +560,7 @@ def main():
 
     # Barre latérale
     with st.sidebar:
-        st.header("🔍 Recherche Entreprise")
+        st.header("Recherche Entreprise")
         siren_input = st.text_input(
             "Numéro SIREN (9 chiffres)",
             value="123456789",
