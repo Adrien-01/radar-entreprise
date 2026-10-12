@@ -34,50 +34,53 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-st.markdown("""
+# Récupération de la valeur actuelle pour adapter dynamiquement la bordure du champ si 9 chiffres
+current_siren_val = st.session_state.get("last_siren", "")
+
+st.markdown(f"""
 <style>
     /* ---------------------------------------------------------------------- */
     /* 0. MASQUAGE TOTAL DE LA SIDEBAR & DU HEADER STREAMLIT                  */
     /* ---------------------------------------------------------------------- */
-    [data-testid="stHeader"] {
+    [data-testid="stHeader"] {{
         display: none !important;
-    }
-    [data-testid="stSidebar"] {
+    }}
+    [data-testid="stSidebar"] {{
         display: none !important;
-    }
-    #MainMenu {
+    }}
+    #MainMenu {{
         visibility: hidden;
-    }
-    footer {
+    }}
+    footer {{
         visibility: hidden;
-    }
+    }}
 
     /* ---------------------------------------------------------------------- */
     /* 1. STYLES GLOBAUX & ESPACEMENT POUR LA BARRE FIXE                      */
     /* ---------------------------------------------------------------------- */
-    html, body {
+    html, body {{
         scroll-behavior: smooth;
         background-color: #0b0d0e !important;
-    }
+    }}
 
-    .stApp {
+    .stApp {{
         background-color: #0b0d0e;
         color: #e2e8f0;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    }}
 
-    .main .block-container {
+    .main .block-container {{
         padding-top: 5.2rem !important;
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
         max-width: 1200px;
-    }
+    }}
 
     /* ---------------------------------------------------------------------- */
     /* 2. CIBLAGE STRICT : BARRE DE RECHERCHE FIXE SUR UNE LIGNE              */
     /* ---------------------------------------------------------------------- */
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {{
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
@@ -94,36 +97,38 @@ st.markdown("""
         margin: 0 !important;
         display: flex !important;
         align-items: center !important;
-    }
+    }}
 
-    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
+    [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {{
         max-width: 1200px;
         margin: 0 auto;
-    }
+    }}
 
-    /* Champ input avec loupe intégrée */
-    div[data-baseweb="input"] {
+    /* Champ input avec loupe intégrée et validation dynamique en vert si 9 chiffres */
+    div[data-baseweb="input"] {{
         background-color: #16191d !important;
-        border: 1px solid #232830 !important;
+        border: 1.5px solid {'#a3e635' if len(current_siren_val) == 9 else '#232830'} !important;
         border-radius: 20px !important;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a3e635' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
         background-repeat: no-repeat !important;
         background-position: 14px center !important;
-    }
+        box-shadow: {'0 0 15px rgba(163, 230, 53, 0.3)' if len(current_siren_val) == 9 else 'none'} !important;
+        transition: all 0.3s ease !important;
+    }}
 
-    div[data-baseweb="input"] input {
+    div[data-baseweb="input"] input {{
         color: #ffffff !important;
         background-color: transparent !important;
         font-weight: 600 !important;
         padding-left: 40px !important;
-    }
+    }}
 
-    div[data-baseweb="input"] input::placeholder {
+    div[data-baseweb="input"] input::placeholder {{
         color: #64748b !important;
-    }
+    }}
 
     /* Bouton recherche */
-    .stButton > button {
+    .stButton > button {{
         background-color: #16191d !important;
         color: #ffffff !important;
         font-weight: 600 !important;
@@ -134,61 +139,61 @@ st.markdown("""
         transition: all 0.3s ease !important;
         box-sizing: border-box !important;
         width: 100% !important;
-    }
+    }}
 
-    .stButton > button:hover {
+    .stButton > button:hover {{
         background-color: #16191d !important;
         border-color: #a3e635 !important;
         color: #a3e635 !important;
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
-    }
+    }}
 
     /* ---------------------------------------------------------------------- */
     /* 3. MEDIA QUERIES : OPTIMISATION MOBILE (< 768px)                       */
     /* ---------------------------------------------------------------------- */
-    @media (max-width: 768px) {
-        .main .block-container {
+    @media (max-width: 768px) {{
+        .main .block-container {{
             padding-top: 4.5rem !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
-        }
-        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
+        }}
+        [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {{
             padding: 8px 1rem !important;
-        }
-    }
+        }}
+    }}
 
     /* Header & Branding responsive */
-    .header-container {
+    .header-container {{
         display: flex;
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
         margin-top: 0.5rem;
-    }
+    }}
 
-    .brand-title {
+    .brand-title {{
         font-size: clamp(2.2rem, 6vw, 3.8rem);
         font-weight: 800;
         color: #a3e635;
         letter-spacing: -0.5px;
         line-height: 1.1;
-    }
+    }}
 
-    .white-subtitle {
+    .white-subtitle {{
         color: #ffffff;
         font-size: clamp(0.95rem, 2.5vw, 1.1rem) !important;
         font-weight: 500 !important;
-    }
+    }}
 
-    .lime-text {
+    .lime-text {{
         color: #a3e635;
         font-weight: 700;
-    }
+    }}
 
     /* ---------------------------------------------------------------------- */
     /* 4. NAVIGATION PAR ANCRES & BOUTON RETOUR                               */
     /* ---------------------------------------------------------------------- */
-    .nav-wrapper {
+    .nav-wrapper {{
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -199,22 +204,22 @@ st.markdown("""
         white-space: nowrap;
         padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
-    }
+    }}
 
-    .nav-wrapper::-webkit-scrollbar {
+    .nav-wrapper::-webkit-scrollbar {{
         height: 3px;
-    }
-    .nav-wrapper::-webkit-scrollbar-thumb {
+    }}
+    .nav-wrapper::-webkit-scrollbar-thumb {{
         background: #232830;
         border-radius: 4px;
-    }
+    }}
 
-    .nav-container {
+    .nav-container {{
         display: flex;
         gap: 0.6rem;
-    }
+    }}
 
-    .nav-btn {
+    .nav-btn {{
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
@@ -228,36 +233,36 @@ st.markdown("""
         text-decoration: none !important;
         flex-shrink: 0;
         transition: all 0.2s ease-in-out;
-    }
+    }}
 
-    .nav-btn:hover {
+    .nav-btn:hover {{
         background-color: #22272e;
         border-color: #a3e635;
         color: #a3e635 !important;
-    }
+    }}
 
     /* ---------------------------------------------------------------------- */
     /* 5. FICHE D'IDENTITÉ & SCORECARDS                                       */
     /* ---------------------------------------------------------------------- */
-    .dark-card {
+    .dark-card {{
         background-color: #16191d;
         border: 1.5px solid #232830;
         border-radius: 16px;
         padding: 1.25rem;
         margin-bottom: 1.2rem;
         transition: all 0.3s ease;
-    }
+    }}
 
-    .dark-card-header {
+    .dark-card-header {{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         gap: 1rem;
         margin-bottom: 1.2rem;
         flex-wrap: wrap;
-    }
+    }}
 
-    .dark-card-grid {
+    .dark-card-grid {{
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
@@ -265,14 +270,14 @@ st.markdown("""
         padding: 1rem;
         border-radius: 12px;
         border: 1px solid #1f242d;
-    }
+    }}
 
-    .dark-card:hover {
+    .dark-card:hover {{
         border-color: #a3e635 !important;
         box-shadow: 0 0 18px rgba(163, 230, 53, 0.15) !important;
-    }
+    }}
 
-    .badge-active {
+    .badge-active {{
         background-color: rgba(163, 230, 53, 0.15);
         color: #a3e635;
         border: 1px solid #a3e635;
@@ -281,9 +286,9 @@ st.markdown("""
         font-size: 0.8rem;
         font-weight: 600;
         white-space: nowrap;
-    }
+    }}
 
-    .badge-inactive {
+    .badge-inactive {{
         background-color: rgba(248, 81, 73, 0.15);
         color: #f85149;
         border: 1px solid #f85149;
@@ -292,9 +297,9 @@ st.markdown("""
         font-size: 0.8rem;
         font-weight: 600;
         white-space: nowrap;
-    }
+    }}
 
-    .kpi-card-large {
+    .kpi-card-large {{
         background: #18181B !important;
         border: 2px solid #22c55e !important;
         border-radius: 16px !important;
@@ -307,47 +312,47 @@ st.markdown("""
         margin-bottom: 0.8rem;
         transition: all 0.25s ease-in-out !important;
         box-sizing: border-box !important;
-    }
+    }}
 
-    .kpi-card-large:hover {
+    .kpi-card-large:hover {{
         background: #166534 !important;
         border: 2.5px solid #a3e635 !important;
         box-shadow: 0 0 20px rgba(163, 230, 53, 0.3) !important;
-    }
+    }}
 
-    .kpi-title {
+    .kpi-title {{
         color: #f0fdf4 !important;
         font-size: 0.95rem !important;
         font-weight: 800 !important;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-    }
+    }}
 
-    .kpi-body {
+    .kpi-body {{
         display: flex;
         align-items: baseline;
         gap: 0.5rem;
         margin: 0.6rem 0;
         flex-wrap: wrap;
-    }
+    }}
 
-    .kpi-value-large {
+    .kpi-value-large {{
         color: #ffffff !important;
         font-size: clamp(2rem, 5vw, 2.8rem) !important;
         font-weight: 900 !important;
         line-height: 1;
-    }
+    }}
 
-    .kpi-unit-large {
+    .kpi-unit-large {{
         color: #dcfce7 !important;
         font-size: 0.95rem !important;
         font-weight: 600;
-    }
+    }}
 
-    hr {
+    hr {{
         border-color: #1f242d !important;
         margin: 1.2rem 0 !important;
-    }
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -480,7 +485,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE FIXE (UNIQUEMENT INPUT & RECHERCHE) ---
+    # --- 1. BARRE DE RECHERCHE FIXE ---
     col_input, col_btn = st.columns([10, 1], gap="small")
 
     with col_input:
@@ -489,7 +494,8 @@ def main():
             value=st.session_state.get("last_siren", ""),
             max_chars=9,
             label_visibility="collapsed",
-            placeholder="N° SIREN (9 chiffres)..."
+            placeholder="N° SIREN (9 chiffres)...",
+            on_change=lambda: st.rerun()
         )
     with col_btn:
         btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
@@ -514,7 +520,6 @@ def main():
     target_siren = st.session_state.get("last_siren", siren_input.strip())
 
     # --- 3. NAVIGATION PAR ANCRES & BOUTON RETOUR CONDITIONNEL ---
-    # Si une recherche est active, on affiche les boutons d'ancres + le bouton Retour à droite
     if target_siren:
         col_nav, col_back = st.columns([10, 1], gap="small")
         with col_nav:
