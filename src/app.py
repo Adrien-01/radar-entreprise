@@ -16,13 +16,9 @@ import streamlit as st
 import duckdb
 from dbt.cli.main import dbtRunner, dbtRunnerResult
 
-# Imports des modules internes
-try:
-    from src.ingestion.fetch_api import ingest_siren_data_to_duckdb
-    from src.components.kpi_cards import render_kpi_cards
-except ModuleNotFoundError:
-    from ingestion.fetch_api import ingest_siren_data_to_duckdb
-    from components.kpi_cards import render_kpi_cards
+# Gestion de l'état de la sidebar dans st.session_state
+if "sidebar_state" not in st.session_state:
+    st.session_state.sidebar_state = "expanded"
 
 # ==============================================================================
 # CONFIGURATION STREAMLIT & STYLES CSS RESPONSIVE
@@ -31,42 +27,17 @@ st.set_page_config(
     page_title="RadarEntreprise",
     page_icon="📡",
     layout="wide",
-    initial_sidebar_state="auto"
+    initial_sidebar_state="expanded"
 )
 
 st.markdown("""
 <style>
     /* ---------------------------------------------------------------------- */
-    /* 0. GESTION DU HEADER & DU BOUTON DE LA SIDEBAR (CORRECTIF)             */
+    /* 0. MASQUAGE DES ELEMENTS SUPERFLUS STREAMLIT                         */
     /* ---------------------------------------------------------------------- */
     [data-testid="stHeader"] {
         background: transparent !important;
-        visibility: visible !important;
     }
-
-    /* Masquer les éléments superflus du header de Streamlit */
-    [data-testid="stHeader"] > div:not(:has([data-testid="collapsedControl"])) {
-        display: none !important;
-    }
-
-    /* Style et visibilité du bouton pour ouvrir/fermer la sidebar */
-    [data-testid="collapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        background-color: #16191d !important;
-        border: 1px solid #2f3642 !important;
-        border-radius: 8px !important;
-        color: #a3e635 !important;
-        z-index: 999999;
-        margin: 0.5rem;
-    }
-
-    [data-testid="collapsedControl"]:hover {
-        border-color: #a3e635 !important;
-        background-color: #22272e !important;
-        color: #a3e635 !important;
-    }
-
     #MainMenu {
         visibility: hidden;
     }
@@ -534,6 +505,14 @@ def render_company_info(data: dict):
 
 
 def main():
+    # Bouton dédié pour afficher/masquer la barre latérale en haut à gauche
+    col_toggle, col_empty = st.columns([1, 6])
+    with col_toggle:
+        toggle_label = "📂 Ouvrir la recherche" if st.session_state.sidebar_state == "collapsed" else "📁 Fermer la recherche"
+        if st.button(toggle_label, use_container_width=True):
+            st.session_state.sidebar_state = "expanded" if st.session_state.sidebar_state == "collapsed" else "collapsed"
+            st.rerun()
+
     # En-tête : RadarEntreprise responsive
     st.markdown(
         '<div class="header-container">'
@@ -558,7 +537,7 @@ def main():
 
     st.divider()
 
-    # Barre latérale
+    # Barre latérale (contrôlée dynamiquement)
     with st.sidebar:
         st.header("Recherche Entreprise")
         siren_input = st.text_input(
