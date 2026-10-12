@@ -159,30 +159,30 @@ st.markdown("""
             padding-right: 1rem !important;
         }
 
-        /* Grille mobile : Input sur la ligne 1, Recherche et Croix sur la ligne 2 */
+        /* Grille mobile à 2 colonnes : Input en haut (sur les 2 colonnes), boutons en bas */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
             display: grid !important;
-            grid-template-columns: 1fr 50px !important;
-            grid-template-areas:
-                "input input"
-                "search clear" !important;
+            grid-template-columns: 1fr 54px !important;
             gap: 8px !important;
             padding: 10px 1rem !important;
         }
 
+        /* L'input SIREN (colonne 1) s'étale sur toute la largeur */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
-            grid-area: input !important;
+            grid-column: 1 / 3 !important;
             width: 100% !important;
             max-width: 100% !important;
         }
 
+        /* Le bouton Recherche (colonne 2) se place sur la ligne 2 à gauche */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
-            grid-area: search !important;
+            grid-column: 1 / 2 !important;
             width: 100% !important;
         }
 
+        /* Le bouton Croix (colonne 3) se place sur la ligne 2 à droite de Recherche */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
-            grid-area: clear !important;
+            grid-column: 2 / 3 !important;
             width: 100% !important;
         }
 
