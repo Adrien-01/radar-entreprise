@@ -48,7 +48,7 @@ def fetch_sirene_data(siren: str) -> Dict[str, Any]:
 
 def fetch_bodacc_data(siren: str) -> Dict[str, Any]:
     """
-    Interroge l'API BODACC (via OpenDataSoft) pour détecter d'éventuelles procédures collectives.
+    Interroge l'API BODACC officielle (via OpenDataSoft) pour détecter d'éventuelles procédures collectives.
     """
     url = f"https://bodacc-dataservice.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records?where=siren%3D%22{siren}%22&limit=20"
     has_procedure = 0
