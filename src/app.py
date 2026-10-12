@@ -98,29 +98,45 @@ st.markdown("""
     [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"] {
         max-width: 1200px;
         margin: 0 auto;
-        width: 100% !important;
     }
 
-    /* Champ input avec loupe verte intégrée (style Deezer épuré) */
+    /* Champ input avec loupe intégrée */
     div[data-baseweb="input"] {
         background-color: #16191d !important;
         border: 1px solid #232830 !important;
         border-radius: 20px !important;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a3e635' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") !important;
         background-repeat: no-repeat !important;
-        background-position: 16px center !important;
-        padding-left: 8px !important;
+        background-position: 14px center !important;
     }
 
     div[data-baseweb="input"] input {
         color: #ffffff !important;
         background-color: transparent !important;
-        font-weight: 500 !important;
-        padding-left: 36px !important;
+        font-weight: 600 !important;
+        padding-left: 40px !important;
     }
 
     div[data-baseweb="input"] input::placeholder {
         color: #64748b !important;
+    }
+
+    /* Bouton loupe discret et élégant */
+    .stButton > button {
+        background-color: #16191d !important;
+        color: #a3e635 !important;
+        font-weight: 700 !important;
+        border-radius: 20px !important;
+        border: 1px solid #232830 !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton > button:hover {
+        background-color: #22272e !important;
+        border-color: #a3e635 !important;
+        color: #a3e635 !important;
+        box-shadow: 0 0 12px rgba(163, 230, 53, 0.2) !important;
     }
 
     /* Header & Branding responsive */
@@ -439,17 +455,19 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE UNIQUE ET FIXE ---
-    siren_input = st.text_input(
-        "Numéro SIREN (9 chiffres)",
-        value=st.session_state.get("last_siren", "123456789"),
-        max_chars=9,
-        label_visibility="collapsed",
-        placeholder="Entrez un numéro SIREN (9 chiffres)..."
-    )
+    # --- 1. BARRE DE RECHERCHE (Proportions adaptées pour le bouton loupe) ---
+    col_input, col_btn = st.columns([10, 1], gap="small")
 
-    if siren_input:
-        st.session_state["last_siren"] = siren_input.strip()
+    with col_input:
+        siren_input = st.text_input(
+            "Numéro SIREN (9 chiffres)",
+            value=st.session_state.get("last_siren", "123456789"),
+            max_chars=9,
+            label_visibility="collapsed",
+            placeholder="N° SIREN (9 chiffres)..."
+        )
+    with col_btn:
+        btn_analyze = st.button("Recherche", type="secondary", use_container_width=True, help="Lancer l'analyse")
 
     # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
@@ -474,6 +492,10 @@ def main():
     """, unsafe_allow_html=True)
 
     st.divider()
+
+    # Gestion de l'état de recherche
+    if btn_analyze:
+        st.session_state["last_siren"] = siren_input.strip()
 
     target_siren = st.session_state.get("last_siren", siren_input.strip())
 
@@ -512,7 +534,7 @@ def main():
                 "(Sirene, BODACC, BOAMP) pour restituer la fiche d'identité et 4 KPI décisionnels."
             )
     else:
-        st.info("👆 Entrez un numéro SIREN ci-dessus pour afficher le tableau de bord.")
+        st.info("👆 Entrez un numéro SIREN ci-dessus et cliquez sur la loupe pour afficher le tableau de bord.")
 
 
 if __name__ == "__main__":
