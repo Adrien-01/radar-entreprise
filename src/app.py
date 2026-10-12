@@ -150,39 +150,40 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 5. MEDIA QUERIES : ADAPTATION SMARTPHONE (< 768px)                     */
+    /* 5. MEDIA QUERIES : ADAPTATION SMARTPHONE (< 768px) (CSS GRID)          */
     /* ---------------------------------------------------------------------- */
     @media (max-width: 768px) {
         .main .block-container {
-            padding-top: 7rem !important; /* Espace suffisant pour la barre fixe sur 2 lignes */
+            padding-top: 7.5rem !important; /* Espace adapté pour la barre sur 2 lignes */
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
 
-        /* La barre fixe passe en mode multiligne avec flex-wrap */
+        /* Grille mobile : Input sur la ligne 1, Recherche et Croix sur la ligne 2 */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            padding: 10px 1rem !important;
+            display: grid !important;
+            grid-template-columns: 1fr 50px !important;
+            grid-template-areas:
+                "input input"
+                "search clear" !important;
             gap: 8px !important;
+            padding: 10px 1rem !important;
         }
 
-        /* Ligne 1 : L'input SIREN prend toute la largeur (100%) */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(1) {
-            flex: 0 0 100% !important;
+            grid-area: input !important;
+            width: 100% !important;
             max-width: 100% !important;
         }
 
-        /* Ligne 2 : Le bouton Recherche prend la majorité de l'espace à gauche */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(2) {
-            flex: 1 1 auto !important;
-            max-width: calc(82% - 4px) !important;
+            grid-area: search !important;
+            width: 100% !important;
         }
 
-        /* Ligne 2 : Le bouton Croix se positionne à côté sur la même ligne */
         [data-testid="stHorizontalBlock"]:has(input[placeholder*="SIREN"]) > [data-testid="column"]:nth-child(3) {
-            flex: 0 0 18% !important;
-            max-width: 18% !important;
+            grid-area: clear !important;
+            width: 100% !important;
         }
 
         /* Réduction de la hauteur des boutons sur mobile */
