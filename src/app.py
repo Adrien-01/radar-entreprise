@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS EN HAUT         */
+    /* 1. STYLES GLOBAUX & SUPPRESSION DES ESPACES SUPERFLUS                  */
     /* ---------------------------------------------------------------------- */
     html {
         scroll-behavior: smooth;
@@ -66,7 +66,7 @@ st.markdown("""
     }
 
     .main .block-container {
-        padding-top: 0rem !important; /* Collé tout en haut */
+        padding-top: 5rem !important; /* Espace réservé pour la barre fixe en haut */
         padding-bottom: 2rem;
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
@@ -74,22 +74,23 @@ st.markdown("""
     }
 
     /* ---------------------------------------------------------------------- */
-    /* BARRE DE RECHERCHE STICKY (Ciblage strict du tout premier bloc)        */
+    /* BARRE DE RECHERCHE FIXE EN TOUT PREMIER (EXCLUSIVITÉ DU BLOC)         */
     /* ---------------------------------------------------------------------- */
-    .main .block-container > div:first-child [data-testid="stHorizontalBlock"],
-    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child [data-testid="stHorizontalBlock"] {
-        position: sticky !important;
+    .main .block-container > div:first-child,
+    .main .block-container > [data-testid="stVerticalBlock"] > div:first-child {
+        position: fixed !important;
         top: 0 !important;
-        z-index: 99999 !important;
-        background-color: rgba(11, 13, 14, 0.95) !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 999999 !important;
+        background-color: rgba(11, 13, 14, 0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        padding: 12px 10px !important;
-        margin-left: -1.5rem !important;
-        margin-right: -1.5rem !important;
-        width: calc(100% + 3rem) !important;
+        padding: 12px 24px !important;
         box-sizing: border-box !important;
         border-bottom: 1px solid #232830 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
     }
 
     /* Champ input avec loupe intégrée */
@@ -119,7 +120,7 @@ st.markdown("""
         align-items: baseline;
         gap: 0.8rem;
         flex-wrap: wrap;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     .brand-title {
@@ -475,7 +476,7 @@ def render_company_info(data: dict):
 
 
 def main():
-    # --- 1. BARRE DE RECHERCHE FIXE (STICKY) EN TOUT PREMIER ---
+    # --- 1. BARRE DE RECHERCHE FIXE EN TOUT PREMIER ---
     col_input, col_btn = st.columns([4, 1], gap="medium")
 
     with col_input:
@@ -489,7 +490,7 @@ def main():
     with col_btn:
         btn_analyze = st.button("Lancer l'analyse 🚀", type="primary", use_container_width=True)
 
-    # --- 2. EN-TÊTE DE LA PAGE (SOUS LA BARRE DE RECHERCHE) ---
+    # --- 2. EN-TÊTE DE LA PAGE ---
     st.markdown(
         '<div class="header-container">'
         '<span class="brand-title">RadarEntreprise</span>'
