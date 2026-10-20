@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_entreprise_360
+    description: "Vue intermédiaire consolidée (360°) croisant Sirene, BODACC, BOAMP et données INSEE."
+    columns:
+      - name: siren
+        description: "Identifiant unique de l'entreprise."
+        tests:
+          - unique
+          - not_null
+      - name: raison_sociale
+        description: "Raison sociale normalisée."
+      - name: flag_bodacc
+        description: "Présence d'une procédure collective."
+      - name: ratio_creation_fermeture
+        description: "Tension sectorielle locale issue des données INSEE."

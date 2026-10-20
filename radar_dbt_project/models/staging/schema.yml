@@ -1,0 +1,42 @@
+version: 2
+
+
+models:
+  - name: stg_sirene
+    description: "Données administratives brutes nettoyées issues de l'API Sirene."
+    columns:
+      - name: siren
+        description: "Numéro SIREN unique de l'entreprise (9 chiffres)."
+        tests:
+          - unique
+          - not_null
+      - name: raison_sociale
+        description: "Nom complet ou raison sociale de l'entreprise."
+      - name: statut_administratif
+        description: "État administratif ('Actif' ou 'Inactif')."
+        tests:
+          - not_null
+      - name: date_creation
+        description: "Date officielle de création de l'entreprise."
+      - name: code_naf
+        description: "Code NAF / APE représentant l'activité principale."
+      - name: departement
+        description: "Code du département du siège social."
+
+  - name: stg_finances
+    description: "Données financières pluriannuelles nettoyées et typées."
+    columns:
+      - name: siren
+        description: "Numéro SIREN de l'entreprise."
+        tests:
+          - not_null
+      - name: annee
+        description: "Année de l'exercice fiscal."
+        tests:
+          - not_null
+      - name: chiffre_affaires
+        description: "Chiffre d'affaires annuel en euros."
+      - name: resultat_net
+        description: "Résultat net annuel en euros."
+      - name: marge_nette_pct
+        description: "Taux de marge nette calculé en pourcentage."

@@ -5,7 +5,7 @@ def afficher_fiche_identite(data: dict):
     Affiche la fiche d'identité administrative et opérationnelle de l'entreprise.
     """
     st.subheader(f"🏢 {data.get('raison_sociale', 'Raison sociale inconnue')}")
-    
+
     # Badge statut administratif (Actif / Inactif)
     statut = data.get("statut_administratif", "Inconnu")
     if statut == "Actif":
@@ -23,7 +23,7 @@ def afficher_fiche_identite(data: dict):
         st.markdown(f"**Tranche d'effectifs :** {data.get('tranche_effectifs', 'Non renseigné')}")
 
     with col2:
-        st.markdown(f"**Activité (NAF/APE) :** {data.get('code_naf')} - {data.get('libelle_naf', '')}")
+        st.markdown(f"**Section d'activité :** {data.get('section_activite', '')}")
         st.markdown(f"**Adresse du siège :** {data.get('adresse_siege', 'N/A')}")
 
     with col3:

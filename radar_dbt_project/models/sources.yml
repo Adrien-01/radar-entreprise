@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: raw_sirene
+      - name: raw_finances
+      - name: raw_bodacc
+      - name: raw_insee_demographie

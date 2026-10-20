@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: mart_enterprise_kpis
+    description: "Table finale (Mart) regroupant les indicateurs clés et libellés décisionnels pour l'interface Streamlit."
+    columns:
+      - name: siren
+        description: "Numéro SIREN unique de l'entreprise."
+        tests:
+          - unique
+          - not_null
+
+      - name: raison_sociale
+        description: "Nom ou raison sociale de l'entreprise."
+
+      - name: flag_bodacc
+        description: "Indicateur binaire (0 ou 1) signalant une procédure collective active sur 24 mois."
+        tests:
+          - accepted_values:
+              values: [0, 1]
+
+      - name: procedure_label
+        description: "Intitulé précis de la procédure collective détectée ou 'Aucune procédure détectée'."
+
+      - name: sante_legale_label
+        description: "Score de santé légale global basé sur le statut administratif et le BODACC."
+        tests:
+          - accepted_values:
+              values: ['SAIN', 'EN VIGILANCE', 'CRITIQUE']
+
+      - name: mouvements_24m
+        description: "Nombre total d'annonces / mouvements enregistrés au BODACC sur les 24 derniers mois."
+
+      - name: gouvernance_label
+        description: "Statut de stabilité de la gouvernance basé sur le volume de mouvements sur 24 mois (seuil à 3)."
+        tests:
+          - accepted_values:
+              values: ['STABLE', 'SIGNAL INSTABILITE']
+
+      - name: age_entreprise_ans
+        description: "Âge de l'entreprise en années calculé depuis sa date de création."
+
+      - name: phase_vie_label
+        description: "Maturité et phase de vie de l'entreprise selon son ancienneté."
+        tests:
+          - accepted_values:
+              values: ['Jeune Pousse', 'Entreprise Établie']
+
+      - name: marge_nette_pct
+        description: "Pourcentage de la marge nette financière."
+
+      - name: rentabilite_label
+        description: "Catégorie de rentabilité financière de l'entreprise."
+        tests:
+          - accepted_values:
+              values: ['MARGE FAIBLE', 'MARGE CONFORME', 'FORTE RENTABILITÉ']
