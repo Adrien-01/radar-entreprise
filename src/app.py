@@ -324,6 +324,12 @@ def run_dbt_pipeline(siren: str) -> bool:
 
         cmd_path = str(potential_dbt) if potential_dbt.exists() else "dbt"
         cmd = [cmd_path, "build", "--vars", f"{{target_siren: '{siren}'}}"]
+        cmd = [
+            cmd_path,
+            "build",
+            "--profiles-dir", ".",
+            "--vars", f"{{target_siren: '{siren}'}}"
+        ]
 
         subprocess.run(
             cmd,
