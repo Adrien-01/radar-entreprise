@@ -348,7 +348,8 @@ def run_dbt_pipeline(siren: str) -> bool:
 
 def fetch_company_data_from_duckdb(siren: str) -> dict:
     with duckdb.connect(str(DB_PATH), read_only=True) as conn:
-        table_exists = conn.sql(
+        # Utilisation de conn.execute() au lieu de conn.sql() pour permettre le .fetchone()
+        table_exists = conn.execute(
             "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'mart_enterprise_kpis'"
         ).fetchone()[0] > 0
 
