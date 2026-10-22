@@ -1,0 +1,7 @@
+radar_dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "data/radar_entreprise.duckdb"
+      threads: 1
