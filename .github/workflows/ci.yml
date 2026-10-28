@@ -30,7 +30,8 @@ jobs:
         run: |
           # Vérifie la syntaxe et la propreté du code Python dans src/
           ruff check src/
-
+      - name: Create data directory for DuckDB
+        run: mkdir -p radar_dbt_project/data
       - name: Validation et compilation dbt (DuckDB)
         run: |
           cd radar_dbt_project
