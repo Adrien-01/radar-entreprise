@@ -27,7 +27,7 @@ jobs:
           pip install pytest ruff
 
       - name: Contrôle qualité Python (Linter Ruff)
-        run: ruff check src/ 
+        run: ruff check src/
 
       - name: Create data directory for DuckDB
         run: mkdir -p radar_dbt_project/data
