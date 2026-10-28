@@ -32,12 +32,14 @@ jobs:
       - name: Create data directory for DuckDB
         run: mkdir -p radar_dbt_project/data
 
-      - name: Validation, compilation et tests dbt (DuckDB)
+      - name: Exécution de dbt run et dbt test (DuckDB)
         working-directory: ./radar_dbt_project
         run: |
-          dbt parse --profiles-dir .
-          dbt compile --profiles-dir .
-          dbt test --profiles-dir . --vars '{"target_siren": "123456789"}'
+          # 1. Crée et peuple les tables dans la base DuckDB
+          dbt run --vars '{"target_siren": "123456789"}'
+          
+          # 2. Exécute les tests sur les tables créées
+          dbt test --vars '{"target_siren": "123456789"}'
 
       - name: Exécution des tests unitaires Python
         run: pytest --ignore=radar_dbt_project
