@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def afficher_fiche_identite(data: dict):
     """
     Affiche la fiche d'identité administrative et opérationnelle de l'entreprise.
@@ -27,7 +28,7 @@ def afficher_fiche_identite(data: dict):
         st.markdown(f"**Adresse du siège :** {data.get('adresse_siege', 'N/A')}")
 
     with col3:
-        st.markdown(f"**Dirigeants / Gouvernance :**")
+        st.markdown("**Dirigeants / Gouvernance :**")
         st.write(data.get('dirigeants', 'Aucun dirigeant répertorié'))
 
     st.markdown("---")

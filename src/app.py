@@ -1,13 +1,12 @@
-import os
-import sys
-import math
-import time
 import gc
+import math
+import os
 import subprocess
+import sys
+import time
 from pathlib import Path
+
 import pandas as pd
-import altair as alt
-import textwrap
 
 # resolution des imports
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -17,8 +16,8 @@ for path in [str(ROOT_DIR), str(CURRENT_DIR)]:
     if path not in sys.path:
         sys.path.insert(0, path)
 
-import streamlit as st
 import duckdb
+import streamlit as st
 
 try:
     from src.ingestion.fetch_api import ingest_siren_data_to_duckdb

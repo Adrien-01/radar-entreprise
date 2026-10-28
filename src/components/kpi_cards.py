@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def render_kpi_cards(kpi_data: dict):
     """
     Rend une grille de 4 KPI décisionnels au format 2x2 avec un style graphique propre,
