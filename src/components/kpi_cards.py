@@ -12,11 +12,23 @@ def render_kpi_cards(kpi_data: dict):
     with col1:
         flag_bodacc = kpi_data.get("flag_bodacc", 0)
         procedure_label = kpi_data.get("procedure_label", "Aucune procédure détectée")
-        mouvements_24m = kpi_data.get("mouvements_24m", 0)
+
+        # Récupération sécurisée du nombre de mouvements sur 24 mois
+        mouvements_24m = kpi_data.get("mouvements_24m", kpi_data.get("nb_mouvements_gov", 0))
 
         is_procedure = (flag_bodacc == 1)
-        status_label = "1 • PROCÉDURE ACTIVE" if is_procedure else "0 • SAIN"
-        badge_class = "badge-red" if is_procedure else "badge-dark"
+
+        # Logique d'affichage et de seuils
+        if is_procedure:
+            status_label = "1 • PROCÉDURE ACTIVE"
+            badge_class = "badge-red"
+        elif mouvements_24m >= 5:
+            # Exemple de seuil personnalisé pour notifier une forte activité légale/mouvements
+            status_label = f"SAIN ({mouvements_24m} mouvts)"
+            badge_class = "badge-dark"
+        else:
+            status_label = "0 • SAIN"
+            badge_class = "badge-dark"
 
         st.markdown(
             f"""
@@ -37,7 +49,7 @@ def render_kpi_cards(kpi_data: dict):
 
     # 2. INDICE D'INSTABILITÉ DE LA GOUVERNANCE (24 mois)
     with col2:
-        mouvements = kpi_data.get("mouvements_24m", 0)
+        mouvements = kpi_data.get("nb_mouvements_gov", kpi_data.get("mouvements_24m", 0))
         is_unstable = (mouvements >= 3)
         badge_label = "SIGNAL D'INSTABILITÉ" if is_unstable else "STABLE"
         badge_class = "badge-red" if is_unstable else "badge-dark"
@@ -91,12 +103,10 @@ def render_kpi_cards(kpi_data: dict):
         marge = kpi_data.get("marge_nette_pct")
         annee = kpi_data.get("annee_exercice", "N/A")
 
-        # Formatage propre des grands nombres
         ca_formatted = f"{ca:,.0f} €".replace(",", " ") if ca is not None else "N/A"
         res_formatted = f"{resultat:,.0f} €".replace(",", " ") if resultat is not None else "N/A"
         marge_formatted = f"{marge:.1f}%" if marge is not None else "N/A"
 
-        # Badge de couleur pour la marge (Rouge si < 1%, Sombre sinon)
         marge_badge_class = "badge-red" if (marge is not None and marge < 1.0) else "badge-dark"
 
         st.markdown(
