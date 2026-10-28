@@ -1,6 +1,7 @@
-import requests
+from typing import Any
+
 import duckdb
-from typing import Dict, Any
+import requests
 
 # 1. Dictionnaire officiel des sections NAF (Rév. 2)
 NAF_SECTIONS = {
@@ -58,7 +59,7 @@ TRANCHES_EFFECTIFS = {
 }
 
 
-def fetch_sirene_data(siren: str) -> Dict[str, Any]:
+def fetch_sirene_data(siren: str) -> dict[str, Any]:
   """Interroge l'API Recherche Entreprises (Insee / Etalab) pour récupérer les données administratives réelles.
 
   Lève une exception si l'entreprise n'est pas trouvée.
@@ -142,17 +143,12 @@ def fetch_sirene_data(siren: str) -> Dict[str, Any]:
   }
 
 
-import requests
 import json
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Any
 
-import requests
-import json
-from datetime import datetime, timedelta
-from typing import Dict, Any
 
-def fetch_bodacc_analytics(siren: str) -> Dict[str, Any]:
+def fetch_bodacc_analytics(siren: str) -> dict[str, Any]:
     """
     Interroge l'API BODACC, filtre les annonces des 24 derniers mois,
     compte les mouvements et détecte les procédures (sans stocker le brut).
@@ -207,7 +203,7 @@ def fetch_bodacc_analytics(siren: str) -> Dict[str, Any]:
     }
 
 
-def get_financial_history(siren: str) -> Dict[str, Any]:
+def get_financial_history(siren: str) -> dict[str, Any]:
     """
     Extrait l'historique financier pluriannuel disponible et calcule la marge nette %.
     """
