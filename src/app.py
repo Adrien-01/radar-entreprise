@@ -980,8 +980,8 @@ def main():
                     "(Sirene, BODACC, Financement, INSEE) pour restituer la fiche d'identite et les indicateurs cles."
                 )
 
-            except Exception as e:
-                st.error(f"Erreur de recherche : Impossible de trouver ou de recuperer les donnees pour le SIREN `{target_siren}`. ({e})")
+            except Exception as e:  # noqa: BLE001
+                st.error(f"Erreur de recherche : Impossible de trouver ou de recuperer les donnees pour le SIREN `{target_siren}`...")
     else:
         st.info("Entrez un numero SIREN ci-dessus et cliquez sur la loupe pour afficher le tableau de bord.")
 

@@ -190,9 +190,9 @@ def fetch_bodacc_analytics(siren: str) -> dict[str, Any]:
                             elif "sauvegarde" in texte_annonce and has_procedure == 0:
                                 has_procedure = 1
                                 procedure_label = "Procédure de sauvegarde"
-                    except Exception:
-                        continue
-    except Exception as e:
+                    except (KeyError, TypeError, ValueError):
+                      continue
+    except Exception as e: # noqa:BLE001
         print(f"❌ [API BODACC Error] {e}")
 
     return {
@@ -248,7 +248,7 @@ def get_financial_history(siren: str) -> dict[str, Any]:
         else:
             print(f"[FINANCES] ❌ Erreur API (Code {response.status_code})")
 
-    except Exception as e:
+    except Exception as e: # noqa:BLE001
         print(f"[FINANCES] ❌ [API Finances Error] {e}")
 
     return {
@@ -297,7 +297,7 @@ def fetch_insee_sector_demography(code_naf: str, departement: str) -> dict:
                 if resp_CE.status_code == 200:
                     fermetures_count = resp_CE.json().get("total_results", 0)
 
-    except Exception as e:
+    except Exception as e: # noqa:BLE001
         print(f"[API INSEE Démographie Error] {e}")
 
     ratio = round(creations_count / max(fermetures_count, 1), 2)
