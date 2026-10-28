@@ -223,7 +223,7 @@ def get_financial_history(siren: str) -> dict[str, Any]:
                 finances = company.get("finances", {})
 
                 if finances:
-                    annees_triees = sorted([str(an) for an in finances.keys()])
+                    annees_triees = sorted([str(an) for an in finances])
 
                     for annee in annees_triees:
                         donnees_annee = finances[annee]
