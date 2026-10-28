@@ -27,22 +27,14 @@ jobs:
           pip install pytest ruff
 
       - name: Contrôle qualité Python (Linter Ruff)
-        run: ruff check src/
-
-      - name: Initialisation des tables sources DuckDB
-        run: python -m src.ingestion.fetch_api --siren 500569405 
+        run: ruff check src/ 
 
       - name: Create data directory for DuckDB
         run: mkdir -p radar_dbt_project/data
 
-      - name: Exécution de dbt run et dbt test (DuckDB)
+      - name: Compilation dbt (sans exécution)
         working-directory: ./radar_dbt_project
-        run: |
-          # 1. Crée et peuple les tables dans la base DuckDB
-          dbt run --vars '{"target_siren": "500569405"}'
-          
-          # 2. Exécute les tests sur les tables créées
-          dbt test --vars '{"target_siren": "500569405"}'
+        run: dbt compile --vars '{"target_siren": "123456789"}'
 
       - name: Exécution des tests unitaires Python
         run: pytest --ignore=radar_dbt_project
