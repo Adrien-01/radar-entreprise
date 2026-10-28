@@ -17,6 +17,8 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+vars:
+  target_siren: "000000000"
 
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
