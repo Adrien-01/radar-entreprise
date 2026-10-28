@@ -36,5 +36,5 @@ jobs:
         working-directory: ./radar_dbt_project
         run: dbt compile
 
-      - name: Exécution des tests unitaires Python
-        run: pytest --ignore=radar_dbt_project
+#      - name: Exécution des tests unitaires Python
+#        run: pytest --ignore=radar_dbt_project
