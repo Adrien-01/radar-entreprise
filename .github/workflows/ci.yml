@@ -33,7 +33,7 @@ jobs:
 
       - name: Validation et compilation dbt (DuckDB)
         run: |
-          cd dbt_project
+          cd radar_dbt_project
           # Test de la syntaxe et compilation des modèles dbt
           dbt parse --profiles-dir .
           dbt compile --profiles-dir .
@@ -41,4 +41,4 @@ jobs:
       - name: Exécution des tests unitaires Python (optionnel)
         run: |
           # Lance les tests unitaires s'il y en a
-          pytest --ignore=dbt_project
+          pytest --ignore=radar_dbt_project
