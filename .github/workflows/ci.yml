@@ -27,26 +27,21 @@ jobs:
           pip install pytest ruff
 
       - name: Contrôle qualité Python (Linter Ruff)
-        run: |
-          # Vérifie la syntaxe et la propreté du code Python dans src/
-          ruff check src/
+        run: ruff check src/
 
       - name: Create data directory for DuckDB
         run: mkdir -p radar_dbt_project/data
 
       - name: Run dbt run
         working-directory: ./radar_dbt_project
-        run: dbt run --vars '{"target_siren": "123456789"}' 
+        run: dbt run --vars '{"target_siren": "123456789"}'
 
       - name: Validation, compilation et tests dbt (DuckDB)
         working-directory: ./radar_dbt_project
         run: |
-          # Test de la syntaxe, compilation et tests des modèles dbt
           dbt parse --profiles-dir .
           dbt compile --profiles-dir .
           dbt test --profiles-dir . --vars '{"target_siren": "123456789"}'
 
       - name: Exécution des tests unitaires Python
-        run: |
-          # Lance les tests unitaires s'il y en a
-          pytest --ignore=radar_dbt_project
+        run: pytest --ignore=radar_dbt_project
